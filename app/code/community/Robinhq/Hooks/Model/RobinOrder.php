@@ -48,7 +48,6 @@ class Robinhq_Hooks_Model_RobinOrder {
     private function make(){
         $base = $this->getBaseInfo();
         $base['details_view'] = $this->getDetailsView();
-        $this->logger->debug($base);
         return $base;
     }
 
@@ -92,13 +91,14 @@ class Robinhq_Hooks_Model_RobinOrder {
      */
     private function getDetails(){
         $payment = $this->order->getPayment()->getMethodInstance();
+        $paymentStatus = $payment->getStatus();
         return array(
-            "display_as" => "Details",
+            "display_as" => "details",
             "data" => array(
                 "date" => $this->order->getCreatedAt(),
                 "status" => $this->order->getStatus(),
                 "payment_method" => $payment->getTitle(),
-                "payment_status" => $payment->getStatus(),
+                "payment_status" => ($paymentStatus === null) ? "" : $paymentStatus,
             )
         );
     }
@@ -138,11 +138,11 @@ class Robinhq_Hooks_Model_RobinOrder {
         );
         if($this->shipments !== false){
             foreach($this->shipments as $shipment){
-                $this->logger->debug($shipment->getData());
                 $url = $this->getShipmentUrl($shipment);
+                $shipmentStatus = $shipment->getShipmentStatus();
                 $base['data'][] = array(
                     "shipment" => "<a target='_blank' href='" . $url . "'>". $shipment->getIncrementId() ."</a>",
-                    "status" => $shipment->getShipmentStatus()
+                    "status" => ($shipmentStatus === null) ? "" : $shipmentStatus
                 );
             }
         }
@@ -164,7 +164,7 @@ class Robinhq_Hooks_Model_RobinOrder {
 
         if($this->order->hasInvoices()){
             foreach($this->order->getInvoiceCollection() as $invoice){
-                $this->logger->debug($invoice->getData());
+//                $this->logger->debug($invoice->getData());
             }
         }
 
@@ -183,8 +183,7 @@ class Robinhq_Hooks_Model_RobinOrder {
             $products[] = array(
                 "product" => $item->getName(),
                 "quantity" => $item->getQtyOrdered(),
-                "price" => Mage::helper('core')->currency($item->getPrice(), true, false),
-                "status" => $item->getStatusLabel()
+                "price" => Mage::helper('core')->currency($item->getPrice(), true, false)
             );
         }
         return $products;
