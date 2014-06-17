@@ -77,7 +77,7 @@ class Robinhq_Hooks_Model_RobinOrder {
         return array(
             "order_number" => $this->order->getIncrementId(),
             "email_address" => $this->order->getCustomerEmail(),
-            "url" => Mage::helper('adminhtml')->getUrl('adminhtml/sales_order/view', array('order_id' => $this->order->getIncrementId())),
+            "url" => $this->getOrderUrl(),
             "list_view" => array(
                 "order_number" => $this->order->getIncrementId(),
                 "date" => $this->order->getCreatedAt(),
@@ -139,8 +139,7 @@ class Robinhq_Hooks_Model_RobinOrder {
         if($this->shipments !== false){
             foreach($this->shipments as $shipment){
                 $this->logger->debug($shipment->getData());
-                $url = Mage::helper('adminhtml')
-                    ->getUrl('adminhtml/sales_order_shipment/view', array('shipment_id' => $shipment->getId()));
+                $url = $this->getShipmentUrl($shipment);
                 $base['data'][] = array(
                     "shipment" => "<a target='_blank' href='" . $url . "'>". $shipment->getIncrementId() ."</a>",
                     "status" => $shipment->getShipmentStatus()
@@ -213,5 +212,26 @@ class Robinhq_Hooks_Model_RobinOrder {
             "quantity" => '',
             "price" => Mage::helper('core')->currency($this->order->getBaseGrandTotal(), true, false),
         );
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getOrderUrl()
+    {
+        return Mage::helper('adminhtml')->getUrl(
+            'adminhtml/sales_order/view',
+            array('order_id' => $this->order->getIncrementId(), '_type' => Mage_Core_Model_Store::URL_TYPE_WEB)
+        );
+    }
+
+    /**
+     * @param $shipment
+     * @return mixed
+     */
+    private function getShipmentUrl($shipment)
+    {
+        return Mage::helper('adminhtml')
+            ->getUrl('adminhtml/sales_order_shipment/view', array('shipment_id' => $shipment->getId(), '_type'=> Mage_Core_Model_Store::URL_TYPE_WEB));
     }
 } 
