@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<config>
+  <modules>
+    <Robinhq_Hooks>
+      <version>0.0.1</version>
+    </Robinhq_Hooks>
+  </modules>
+  <global>
+    <helpers>
+      <hooks>
+        <class>Robinhq_Hooks_Helper</class>
+      </hooks>
+    </helpers>
+	<models>
+	  <hooks>
+		<class>Robinhq_Hooks_Model</class>
+		<resourceModel>hooks_mysql4</resourceModel>
+	  </hooks>
+	</models>
+    <events>
+	  <customer_save_after> <!-- identifier of the event we want to catch -->
+        <observers>
+          <customer_save_after_handler> <!-- identifier of the event handler -->
+            <type>singleton</type> <!-- class method call type; valid are model, object and singleton -->
+            <class>hooks/observer</class> <!-- observers class alias -->
+            <method>customerHook</method>  <!-- observer's method to be called -->
+            <args></args> <!-- additional arguments passed to observer -->
+          </customer_save_after_handler>
+        </observers>
+      </customer_save_after>
+	  <sales_order_place_after> <!-- identifier of the event we want to catch -->
+        <observers>
+          <sales_order_place_after_handler> <!-- identifier of the event handler -->
+            <type>singleton</type> <!-- class method call type; valid are model, object and singleton -->
+            <class>hooks/observer</class> <!-- observers class alias -->
+            <method>orderPlacedHook</method>  <!-- observer's method to be called -->
+            <args></args> <!-- additional arguments passed to observer -->
+          </sales_order_place_after_handler>
+        </observers>
+      </sales_order_place_after>
+	  <sales_order_save_after> <!-- identifier of the event we want to catch -->
+        <observers>
+          <sales_order_save_after_handler> <!-- identifier of the event handler -->
+            <type>singleton</type> <!-- class method call type; valid are model, object and singleton -->
+            <class>hooks/observer</class> <!-- observers class alias -->
+            <method>orderStatusChanceHook</method>  <!-- observer's method to be called -->
+            <args></args> <!-- additional arguments passed to observer -->
+          </sales_order_save_after_handler>
+        </observers>
+      </sales_order_save_after>
+    </events>
+  </global>
+</config> 

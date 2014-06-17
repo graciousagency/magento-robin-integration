@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config>
+  <modules>
+    <Robinhq_Hooks>
+      <active>true</active>
+      <codePool>community</codePool>
+      <version>0.0.1</version>
+    </Robinhq_Hooks>
+  </modules>
+</config>
