@@ -102,6 +102,7 @@ class Robinhq_Hooks_Model_Api {
             $url = $config['baseUrl'] . $request;
             $this->logger->debug($url);
             $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_USERPWD, $config['apikey'] . ":" . $config['secret']);
             return $ch;
@@ -130,7 +131,10 @@ class Robinhq_Hooks_Model_Api {
         }
         $valuesLength = strlen($values);
         $this->logger->log("Posting with: " . $values);
-        curl_setopt($ch, CURLOPT_POST, $valuesLength);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                'Content-Type: application/json',
+                'Content-Length: ' . $valuesLength
+        ));
         curl_setopt($ch, CURLOPT_POSTFIELDS, $values);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
