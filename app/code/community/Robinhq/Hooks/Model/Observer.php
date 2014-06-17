@@ -37,17 +37,7 @@ class Robinhq_Hooks_Model_Observer
     public function customerHook(Varien_Event_Observer $observer)
     {
         $customer = $observer->getEvent()->getCustomer();
-        if($customer){
-           $this->logger->log("user with id: ". $customer->getId() . " chanced");
-            try{
-                $this->api->customers(array($customer));
-            }
-            catch(Exception $e){
-                $this->logger->log("Exception: ". $e->getMessage());
-                $this->logger->warnAdmin('Unable to send changes to ROBIN, see the log file for more information.');
-            }
-
-        }
+        $this->_customerHook($customer);
     }
 
     /**
@@ -82,8 +72,10 @@ class Robinhq_Hooks_Model_Observer
     public function orderStatusChanceHook(Varien_Event_Observer $observer)
     {
         $order = $observer->getEvent()->getOrder();
-        if(is_string($order->getStatus())){ //only fire when we actually have an status
-            $string = "The status of order #" . $order->getId() . " chanced to: " . $order->getStatus();
+        $status = $order->getStatus();
+        $this->logger->log($status);
+        if(is_string($status)){ //only fire when we actually have an status
+            $string = "The status of order #" . $order->getIncrementId() . " chanced to: " . $order->getStatus();
             $this->logger->log($string);
             try{
                 $this->api->orders(array($order));
@@ -92,6 +84,31 @@ class Robinhq_Hooks_Model_Observer
                 $this->logger->log("Exception: ". $e->getMessage());
                 $this->logger->warnAdmin('Unable to send changes to ROBIN, see the log file for more information.');
             }
+            if($status === 'complete'){
+                $this->logger->log("Sending customer info to Robin!");
+                $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
+                $this->logger->debug($customer->toArray());
+                $this->_customerHook($customer);
+            }
+        }
+
+    }
+
+
+    /**
+     * @param Mage_Customer_Model_Customer $customer
+     */
+    private function _customerHook(Mage_Customer_Model_Customer $customer)
+    {
+        if ($customer) {
+            $this->logger->log("user with id: " . $customer->getId() . " chanced");
+            try {
+                $this->api->customers(array($customer));
+            } catch (Exception $e) {
+                $this->logger->log("Exception: " . $e->getMessage());
+                $this->logger->warnAdmin('Unable to send changes to ROBIN, see the log file for more information.');
+            }
+
         }
     }
 
