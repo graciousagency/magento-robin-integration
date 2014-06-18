@@ -218,9 +218,10 @@ class Robinhq_Hooks_Model_RobinOrder {
      */
     private function getOrderUrl()
     {
+        $orderId = Mage::getModel('sales/order')->loadByIncrementId($this->order->getIncrementId())->getId();
         return Mage::helper('adminhtml')->getUrl(
             'adminhtml/sales_order/view',
-            array('order_id' => $this->order->getIncrementId(), '_type' => Mage_Core_Model_Store::URL_TYPE_WEB)
+            array('order_id' => $this->order->getId(), '_type' => Mage_Core_Model_Store::URL_TYPE_WEB)
         );
     }
 
