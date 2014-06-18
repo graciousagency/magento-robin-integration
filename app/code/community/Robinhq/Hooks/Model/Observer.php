@@ -84,12 +84,11 @@ class Robinhq_Hooks_Model_Observer
                 $this->logger->log("Exception: ". $e->getMessage());
                 $this->logger->warnAdmin('Unable to send changes to ROBIN, see the log file for more information.');
             }
-            if($status === 'complete'){
-                $this->logger->log("Order is completed, sending updated customer info to Robin");
-                $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
-                $this->logger->debug($customer->toArray());
-                $this->_customerHook($customer);
-            }
+
+            $this->logger->log("Order has changed, sending updated customer info to Robin");
+            $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
+            $this->logger->debug($customer->toArray());
+            $this->_customerHook($customer);
         }
 
     }
