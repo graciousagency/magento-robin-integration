@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<config>
+    <tabs>
+        <robinhq translate="label" module="hooks">
+            <label>RobinHQ</label>
+            <sort_order>150</sort_order>
+        </robinhq>
+    </tabs>
+    <sections>
+        <settings  translate="label" module="hooks">
+            <label>Settings</label>
+            <tab>robinhq</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>10</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <general translate="label">
+                    <label>General</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>0</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <api_key translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Your Robin api key</comment>
+                        </api_key>
+                        <api_secret translate="label">
+                            <label>API Secret</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>200</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>Your Robin api secret</comment>
+                        </api_secret>
+                        <api_base_url translate="label">
+                            <label>API Url</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>300</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>The base url for API requests</comment>
+                        </api_base_url>
+                    </fields>
+                </general>
+            </groups>
+        </settings>
+    </sections>
+</config>
