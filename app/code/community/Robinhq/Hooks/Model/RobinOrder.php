@@ -182,7 +182,7 @@ class Robinhq_Hooks_Model_RobinOrder {
         foreach ($items as $item) {
             $products[] = array(
                 "product" => $item->getName(),
-                "quantity" => $item->getQtyOrdered(),
+                "quantity" => (int) $item->getQtyOrdered(),
                 "price" => Mage::helper('core')->currency($item->getPrice(), true, false)
             );
         }
@@ -218,7 +218,6 @@ class Robinhq_Hooks_Model_RobinOrder {
      */
     private function getOrderUrl()
     {
-        $orderId = Mage::getModel('sales/order')->loadByIncrementId($this->order->getIncrementId())->getId();
         return Mage::helper('adminhtml')->getUrl(
             'adminhtml/sales_order/view',
             array('order_id' => $this->order->getId(), '_type' => Mage_Core_Model_Store::URL_TYPE_WEB)
@@ -231,7 +230,13 @@ class Robinhq_Hooks_Model_RobinOrder {
      */
     private function getShipmentUrl($shipment)
     {
+        $shipmentId = Mage::getModel('sales/order_shipment')
+            ->loadByIncrementId($shipment->getIncrementId())
+            ->getId();
+        $this->logger->log($shipmentId);
         return Mage::helper('adminhtml')
-            ->getUrl('adminhtml/sales_order_shipment/view', array('shipment_id' => $shipment->getId(), '_type'=> Mage_Core_Model_Store::URL_TYPE_WEB));
+            ->getUrl(
+                'adminhtml/sales_shipment/view',
+                array('shipment_id' => $shipmentId, '_type'=> Mage_Core_Model_Store::URL_TYPE_WEB));
     }
 } 
