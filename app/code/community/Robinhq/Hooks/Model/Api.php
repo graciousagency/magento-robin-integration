@@ -95,10 +95,9 @@ class Robinhq_Hooks_Model_Api {
      * @return bool|resource
      */
     function setUpCurl($request){
-        //these settings could go into the backend...
-        $file = __DIR__ . join(DS, array('', '..', 'etc', 'api_config.php'));
-        if(file_exists($file)){
-            $config = require $file;
+        $config = Mage::getStoreConfig('settings/general');
+        $this->logger->log(json_encode($config));
+        if(!empty($config['api_key']) && !empty($config['api_secret'])){
             $url = $config['baseUrl'] . $request;
             $this->logger->debug($url);
             $ch = curl_init($url);
@@ -107,8 +106,7 @@ class Robinhq_Hooks_Model_Api {
             curl_setopt($ch, CURLOPT_USERPWD, $config['apikey'] . ":" . $config['secret']);
             return $ch;
         }
-        $this->logger->log('Can not find settings file! ' . $file);
-        throw new Exception('Can not find settings file! ' . $file);
+        throw new Exception('Missing API configuration, go to Admin Panel -> System -> Configuration -> ROBINHQ -> Settings and fill in your API credentials');
     }
 
     /**

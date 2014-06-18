@@ -50,4 +50,13 @@
       </sales_order_save_after>
     </events>
   </global>
+    <default>
+        <settings>
+            <general>
+                <api_key></api_key>
+                <api_secret></api_secret>
+                <api_url>https://api.robinhq.com/</api_url>
+            </general>
+        </settings>
+    </default>
 </config> 

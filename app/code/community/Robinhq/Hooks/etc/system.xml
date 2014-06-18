@@ -17,7 +17,7 @@
             <show_in_store>1</show_in_store>
             <groups>
                 <general translate="label">
-                    <label>General</label>
+                    <label>API Settings</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>0</sort_order>
                     <show_in_default>1</show_in_default>
@@ -42,15 +42,15 @@
                             <show_in_store>1</show_in_store>
                             <comment>Your Robin api secret</comment>
                         </api_secret>
-                        <api_base_url translate="label">
+                        <api_url translate="label">
                             <label>API Url</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>300</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>The base url for API requests</comment>
-                        </api_base_url>
+                            <comment>Robin API url</comment>
+                        </api_url>
                     </fields>
                 </general>
             </groups>
