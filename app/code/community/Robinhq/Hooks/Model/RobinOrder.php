@@ -231,7 +231,7 @@ class Robinhq_Hooks_Model_RobinOrder {
     {
         return Mage::helper('adminhtml')->getUrl(
             'adminhtml/sales_order/view',
-            array('order_id' => $this->order->getId(), '_type' => Mage_Core_Model_Store::URL_TYPE_WEB, 'key' => Mage::getSingleton('adminhtml/url')->getSecretKey())
+            array('order_id' => $this->order->getId(), '_type' => Mage_Core_Model_Store::URL_TYPE_WEB)
         );
     }
 
@@ -247,7 +247,7 @@ class Robinhq_Hooks_Model_RobinOrder {
         return Mage::helper('adminhtml')
             ->getUrl(
                 'adminhtml/sales_shipment/view',
-                array('shipment_id' => $shipmentId, '_type'=> Mage_Core_Model_Store::URL_TYPE_WEB, 'key' => Mage::getSingleton('adminhtml/url')->getSecretKey()));
+                array('shipment_id' => $shipmentId, '_type'=> Mage_Core_Model_Store::URL_TYPE_WEB));
     }
 
     /**
@@ -281,7 +281,7 @@ class Robinhq_Hooks_Model_RobinOrder {
         return Mage::helper('adminhtml')
             ->getUrl(
                 'adminhtml/sales_invoice/view',
-                array('invoice_id' => $invoice->getId(), '_type' => Mage_Core_Model_Store::URL_TYPE_WEB, 'key' => Mage::getSingleton('adminhtml/url')->getSecretKey())
+                array('invoice_id' => $invoice->getId(), '_type' => Mage_Core_Model_Store::URL_TYPE_WEB)
             );
     }
 } 
