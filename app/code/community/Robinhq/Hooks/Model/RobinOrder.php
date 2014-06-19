@@ -17,10 +17,13 @@ class Robinhq_Hooks_Model_RobinOrder {
     private $shipments;
 
     /**
-     * @var Robinhq_Hooks_Model_Logger
+     * @var Robinhq_Hooks_Helper_Data
      */
-    private $logger;
+    private $helper;
 
+    public function __construct(){
+//        $this->helper = Mage::helper('hooks');
+    }
 
     /**
      * Factory method for creating an array with data that is
@@ -34,8 +37,8 @@ class Robinhq_Hooks_Model_RobinOrder {
      */
     public function factory(Mage_Sales_Model_Order $order){
         $this->order = $order;
+        $this->helper = Mage::helper('hooks');
         $this->shipments = $this->order->getShipmentsCollection();
-        $this->logger = Mage::getModel('hooks/logger');
         return $this->make();
     }
 
@@ -63,8 +66,8 @@ class Robinhq_Hooks_Model_RobinOrder {
         $details = $this->getDetails();
         $productsOverview = $this->getProductsOverview();
         $shipments = $this->getShipments();
-//        $invoices = $this->getInvoices();
-        return array($details, $productsOverview, $shipments);
+        $invoices = $this->getInvoices();
+        return array($details, $productsOverview, $shipments, $invoices);
     }
 
     /**
@@ -76,7 +79,7 @@ class Robinhq_Hooks_Model_RobinOrder {
         return array(
             "order_number" => $this->order->getIncrementId(),
             "email_address" => $this->order->getCustomerEmail(),
-            "url" => $this->getOrderUrl(),
+            "url" => $this->getOrderAdminUrl(),
             "list_view" => array(
                 "order_number" => $this->order->getIncrementId(),
                 "date" => $this->order->getCreatedAt(),
@@ -126,7 +129,7 @@ class Robinhq_Hooks_Model_RobinOrder {
     }
 
     /**
-     * When there are shipments, it lists them and their status.Other
+     * When there are shipments, it lists them and their status.
      * Otherwise the 'data' key stays empty.
      * @return array
      */
@@ -136,13 +139,14 @@ class Robinhq_Hooks_Model_RobinOrder {
             "caption" => 'shipments',
             "data" => array()
         );
+        $orderStatus = $this->order->getState();
         if($this->shipments !== false){
             foreach($this->shipments as $shipment){
+                $this->helper->getLogger()->debug($shipment->getData());
                 $url = $this->getShipmentUrl($shipment);
-                $shipmentStatus = $shipment->getShipmentStatus();
                 $base['data'][] = array(
-                    "shipment" => "<a target='_blank' href='" . $url . "'>". $shipment->getIncrementId() ."</a>",
-                    "status" => ($shipmentStatus === null) ? "" : $shipmentStatus
+                    "Shipment:" => "<a target='_blank' href='" . $url . "'>". $shipment->getIncrementId() ."</a>",
+                    "Status:" => ($orderStatus === Mage_Sales_Model_Order::STATE_COMPLETE) ? "Shipped" : "Processing"
                 );
             }
         }
@@ -151,7 +155,7 @@ class Robinhq_Hooks_Model_RobinOrder {
     }
 
     /**
-     * Should get the invoices, did not get it working in my test shop.
+     * When there are invoices it lists them with a link, status and the price.
      *
      * @return array
      */
@@ -164,7 +168,14 @@ class Robinhq_Hooks_Model_RobinOrder {
 
         if($this->order->hasInvoices()){
             foreach($this->order->getInvoiceCollection() as $invoice){
-//                $this->logger->debug($invoice->getData());
+                $status = $this->getInvoiceStatus($invoice);
+                $url = $this->getInvoiceAdminUrl($invoice);
+                $base['data'][] = array(
+                    "Invoice:" => "<a target='_blank' href='" . $url ."'>" . $invoice->getIncrementId(). "</a>",
+                    "Status:" => $status,
+                    "Price:" => $this->helper->formatPrice($invoice->getBaseGrandTotal())
+                );
+//                $this->helper->getLogger()->debug($invoice->getState());
             }
         }
 
@@ -181,9 +192,9 @@ class Robinhq_Hooks_Model_RobinOrder {
         //All products from this order
         foreach ($items as $item) {
             $products[] = array(
-                "product" => $item->getName(),
-                "quantity" => (int) $item->getQtyOrdered(),
-                "price" => Mage::helper('core')->currency($item->getPrice(), true, false)
+                "Product" => $item->getName(),
+                "Quantity" => (int) $item->getQtyOrdered(),
+                "Price" => $this->helper->formatPrice($item->getPrice())
             );
         }
         return $products;
@@ -195,9 +206,9 @@ class Robinhq_Hooks_Model_RobinOrder {
     private function getShipmentInfo()
     {
         return array(
-            "Product" => "Shipment",
-            "quantity" => '',
-            "price" => Mage::helper('core')->currency($this->order->getBaseShippingAmount(), true, false),
+            "Product:" => "Shipment",
+            "Quantity:" => '',
+            "Price:" => $this->helper->formatPrice($this->order->getBaseShippingAmount()),
         );
     }
 
@@ -209,18 +220,18 @@ class Robinhq_Hooks_Model_RobinOrder {
         return array(
             "Product" => "Total",
             "quantity" => '',
-            "price" => Mage::helper('core')->currency($this->order->getBaseGrandTotal(), true, false),
+            "price" => $this->helper->formatPrice($this->order->getBaseGrandTotal()),
         );
     }
 
     /**
      * @return mixed
      */
-    private function getOrderUrl()
+    private function getOrderAdminUrl()
     {
         return Mage::helper('adminhtml')->getUrl(
             'adminhtml/sales_order/view',
-            array('order_id' => $this->order->getId(), '_type' => Mage_Core_Model_Store::URL_TYPE_WEB)
+            array('order_id' => $this->order->getId(), '_type' => Mage_Core_Model_Store::URL_TYPE_WEB, 'key' => Mage::getSingleton('adminhtml/url')->getSecretKey())
         );
     }
 
@@ -233,10 +244,44 @@ class Robinhq_Hooks_Model_RobinOrder {
         $shipmentId = Mage::getModel('sales/order_shipment')
             ->loadByIncrementId($shipment->getIncrementId())
             ->getId();
-        $this->logger->log($shipmentId);
         return Mage::helper('adminhtml')
             ->getUrl(
                 'adminhtml/sales_shipment/view',
-                array('shipment_id' => $shipmentId, '_type'=> Mage_Core_Model_Store::URL_TYPE_WEB));
+                array('shipment_id' => $shipmentId, '_type'=> Mage_Core_Model_Store::URL_TYPE_WEB, 'key' => Mage::getSingleton('adminhtml/url')->getSecretKey()));
+    }
+
+    /**
+     * @param $invoice
+     * @return string
+     */
+    private function getInvoiceStatus($invoice)
+    {
+        $stateCode = $invoice->getState();
+        switch ($stateCode) {
+            case Mage_Sales_Model_Order_Invoice::STATE_CANCELED:
+                $state = "Canceled";
+                break;
+            case Mage_Sales_Model_Order_Invoice::STATE_PAID:
+                $state = "Paid";
+                break;
+            default:
+                $state = 'Open';
+                break;
+        }
+        return $state;
+    }
+
+
+    /**
+     * @param $invoice
+     * @return string
+     */
+    private function getInvoiceAdminUrl($invoice)
+    {
+        return Mage::helper('adminhtml')
+            ->getUrl(
+                'adminhtml/sales_invoice/view',
+                array('invoice_id' => $invoice->getId(), '_type' => Mage_Core_Model_Store::URL_TYPE_WEB, 'key' => Mage::getSingleton('adminhtml/url')->getSecretKey())
+            );
     }
 } 
