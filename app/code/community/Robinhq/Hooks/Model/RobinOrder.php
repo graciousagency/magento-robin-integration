@@ -21,10 +21,6 @@ class Robinhq_Hooks_Model_RobinOrder {
      */
     private $helper;
 
-    public function __construct(){
-//        $this->helper = Mage::helper('hooks');
-    }
-
     /**
      * Factory method for creating an array with data that is
      * required by the Robin API. Also adds a example 'details_view' key
