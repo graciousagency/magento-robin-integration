@@ -29,6 +29,7 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function sendOrders(){
         $collection = Mage::getModel('sales/order')->getCollection();
+//        $this->helper->log($collection->count());
         $this->api->orders($collection);
     }
 
@@ -44,8 +45,34 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract
         $this->api->customers($collection);
     }
 
+    /**
+     * @param $message
+     */
     public function log($message){
         $this->logger->log($message);
+    }
+
+    /**
+     * @return Robinhq_Hooks_Model_Api
+     */
+    public function getApi(){
+        return $this->api;
+    }
+
+    public function getLogger(){
+        return $this->logger;
+    }
+
+    public static function warnAdmin($warning){
+        Mage::getSingleton('adminhtml/session')->addWarning("Robin: " . $warning);
+    }
+
+    public static function noticeAdmin($notice){
+        Mage::getSingleton('adminhtml/session')->addSuccess("Robin: " . $notice);
+    }
+
+    public static function formatPrice($price){
+        return Mage::helper('core')->currency($price, true, false);
     }
 }
 	 
