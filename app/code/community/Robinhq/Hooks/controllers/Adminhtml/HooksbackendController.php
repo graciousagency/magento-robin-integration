@@ -11,10 +11,16 @@ class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Cont
      */
     private $helper;
 
+    /**
+     * Sets up $this->helper
+     */
     private function init(){
         $this->helper = Mage::helper('hooks');
     }
 
+    /**
+     * Before the index is rendered
+     */
     private function beforeRenderIndex(){
         $this->_title($this->__("Robin"));
         $block = $this->getLayout()
@@ -27,9 +33,7 @@ class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Cont
         $this->_setActiveMenu('robinhq/hooks');
     }
 
-    /**
-     *
-     */
+
     public function indexAction()
     {
         $this->loadLayout();
@@ -38,7 +42,8 @@ class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Cont
     }
 
     /**
-     *
+     * Gets ran when the user clicks the 'run' button on the page.
+     * Sends all customers and orders to Robin.
      */
     public function runAction()
     {
