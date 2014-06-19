@@ -92,21 +92,20 @@ class Robinhq_Hooks_Model_Api {
      * Throws exception when settings file is not found
      * @param $request
      * @throws Exception
-     * @return bool|resource
+     * @return resource
      */
     function setUpCurl($request){
         $config = Mage::getStoreConfig('settings/general');
-        $this->logger->log(json_encode($config));
         if(!empty($config['api_key']) && !empty($config['api_secret'])){
-            $url = $config['baseUrl'] . $request;
-            $this->logger->debug($url);
+            $url = $config['api_url'] . $request;
+            $this->logger->log("Posting to [" . $url . "]");
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
             curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_USERPWD, $config['apikey'] . ":" . $config['secret']);
+            curl_setopt($ch, CURLOPT_USERPWD, $config['api_key'] . ":" . $config['api_secret']);
             return $ch;
         }
-        throw new Exception('Missing API configuration, go to Admin Panel -> System -> Configuration -> ROBINHQ -> Settings and fill in your API credentials');
+        throw new Exception('Missing API configuration, go to System -> Configuration -> ROBINHQ -> Settings and fill in your API credentials');
     }
 
     /**
@@ -118,15 +117,9 @@ class Robinhq_Hooks_Model_Api {
      * @return mixed
      */
     function post($request, $values){
-        try {
-            $errorCodes = array(500, 400, 401);
-            $values = json_encode($values);
-            $ch = $this->setUpCurl($request);
-        }
-        catch(Exception $e){
-            $this->abort($e->getMessage());
-            return false;
-        }
+        $errorCodes = array(500, 400, 401);
+        $values = json_encode($values);
+        $ch = $this->setUpCurl($request);
         $valuesLength = strlen($values);
         $this->logger->log("Posting with: " . $values);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
@@ -138,27 +131,17 @@ class Robinhq_Hooks_Model_Api {
 
         if (curl_exec($ch) === false) {
             curl_close($ch);
-            throw new Exception("Exception: Request to Robin failed");
+            throw new Exception("Error: 'Request to Robin failed'");
         }
         $responseInfo = curl_getinfo($ch);
         curl_close($ch);
         if (in_array($responseInfo['http_code'], $errorCodes)) {
-            throw new Exception("Exception: 'Robin returned status code " . $responseInfo['http_code']."'");
+            throw new Exception("Error: 'Robin returned status code " . $responseInfo['http_code']."'");
         }
-
-        $this->logger->debug($responseInfo);
-
+//        $this->logger->debug($responseInfo);
         $this->logger->log("Robin returned status: " . $responseInfo['http_code']);
-        return $responseInfo;
-    }
 
-    /**
-     * Notify's the admin page that something went wrong.
-     * @param string $message
-     */
-    function abort($message = "Something went wrong!"){
-        $this->logger->log($message);
-        Mage::getSingleton('adminhtml/session')->addWarning('Unable to send changes to ROBIN, see the log file for more information.');
+        return $responseInfo;
     }
 
 } 
