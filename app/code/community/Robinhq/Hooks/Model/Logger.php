@@ -26,8 +26,4 @@ class Robinhq_Hooks_Model_Logger {
     public static function debug($value){
         Mage::log($value, null, "Robinhq_Hooks-debug.log");
     }
-
-    public static function warnAdmin($warning){
-        Mage::getSingleton('adminhtml/session')->addWarning($warning);
-    }
 }
