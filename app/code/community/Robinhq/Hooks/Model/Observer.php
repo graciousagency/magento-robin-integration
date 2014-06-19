@@ -7,23 +7,21 @@
 class Robinhq_Hooks_Model_Observer
 {
 
-
-    /**
-     * @var Robinhq_Hooks_Model_Logger
-     */
-    private $logger;
-
     /**
      * @var Robinhq_Hooks_Model_Api
      */
     private $api;
 
     /**
+     * @var Robinhq_Hooks_Helper_Data
+     */
+    private $helper;
+    /**
      * Gets and sets the dependency's
      */
     public function __construct(){
-        $this->logger = Mage::getModel('hooks/logger');
-        $this->api = Mage::getModel('hooks/api');
+        $this->helper = Mage::helper("hooks");
+        $this->api = $this->helper->getApi();
     }
 
 
@@ -50,13 +48,13 @@ class Robinhq_Hooks_Model_Observer
     {
         $order = $observer->getEvent()->getOrder();
         if($order){
-            $this->logger->log("New order placed with id: " . $order->getId());
+            $this->helper->log("New order placed with id: " . $order->getId());
             try{
                 $this->api->orders(array($order));
             }
             catch(Exception $e){
-                $this->logger->log("Exception: ". $e->getMessage());
-                $this->logger->warnAdmin('Unable to send changes to ROBIN, see the log file for more information.');
+                $this->helper->log("Exception: ". $e->getMessage());
+                $this->helper->warnAdmin($e->getMessage());
             }
         }
 
@@ -73,22 +71,20 @@ class Robinhq_Hooks_Model_Observer
     {
         $order = $observer->getEvent()->getOrder();
         $status = $order->getStatus();
-        $this->logger->log($status);
+        $this->helper->log($status);
         if(is_string($status)){ //only fire when we actually have an status
             $string = "The status of order #" . $order->getIncrementId() . " chanced to: " . $order->getStatus();
-            $this->logger->log($string);
+            $this->helper->log($string);
             try{
                 $this->api->orders(array($order));
+                $this->helper->log("Order has changed, sending updated customer info to Robin");
+                $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
+                $this->_customerHook($customer);
             }
             catch(Exception $e){
-                $this->logger->log("Exception: ". $e->getMessage());
-                $this->logger->warnAdmin('Unable to send changes to ROBIN, see the log file for more information.');
+                $this->helper->log("Exception: ". $e->getMessage());
+                $this->helper->warnAdmin($e->getMessage());
             }
-
-            $this->logger->log("Order has changed, sending updated customer info to Robin");
-            $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
-            $this->logger->debug($customer->toArray());
-            $this->_customerHook($customer);
         }
 
     }
@@ -100,12 +96,12 @@ class Robinhq_Hooks_Model_Observer
     private function _customerHook(Mage_Customer_Model_Customer $customer)
     {
         if ($customer) {
-            $this->logger->log("user with id: " . $customer->getId() . " chanced");
+            $this->helper->log("user with id: " . $customer->getId() . " chanced");
             try {
                 $this->api->customers(array($customer));
             } catch (Exception $e) {
-                $this->logger->log("Exception: " . $e->getMessage());
-                $this->logger->warnAdmin('Unable to send changes to ROBIN, see the log file for more information.');
+                $this->helper->log("Exception: " . $e->getMessage());
+                $this->helper->warnAdmin($e->getMessage());
             }
 
         }
