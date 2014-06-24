@@ -276,13 +276,13 @@ Inside the `data` key you can add an array with objects containing key/value pai
 ```JSON
 {
     "Date:":"Jun 24, 2014 2:35:41 AM",
-    "Content": "This is a comment from the admin",
-    "Order Status":"On Hold",
+    "Content:": "This is a comment from the admin",
+    "Order Status:":"On Hold",
     "Customer Notified:":"Yes"
 }
 ```
 
- Note, the content of the key will also be displayed, so be sure to format it nicely.
+ Note: the content of the key will also be displayed, so be sure to format it nicely.
 
 
 
@@ -293,11 +293,12 @@ This example code is all developed with the use of a Vagrant box. If you want to
 
 I recommend to use [this one][magento-vagrant-github]. Simply follow the instructions provided there and you should have a virtual Magento installation in no-time. 
 
-__Git and Magento module development__
+####Git and Magento module development
 
+The development of a Magento module that is a git repo can be hard. To get it working I've figured out the following.
 Make a folder called `module` inside your Vagrant root and do a git clone inside that folder (`git clone [url] .`). Make sure it's inside the Vagrant root, because this will ensure the files are automatically accessible inside the Vagrant machine.
 
-To get arount the git + magento module development headache simply do the following commands in the folder where you ran `vagrant up`
+Next simply do the following commands in the folder where you ran `vagrant up` (if you haven't done that yet, please do it now and wait till it completes)
 ```bash
 vagrant ssh
 ln -s /vagrant/module/app/etc/modules/Robinhq_Hooks.xml /vagrant/www/magento/app/etc/modules/Robinhq_Hooks.xml
@@ -305,10 +306,10 @@ ln -s /vagrant/module/app/code/community/Robinhq/ /vagrant/www/magento/app/code/
 ln -s /vagrant/module/design/adminhtml/default/default/layout/hooks.xml /vagrant/www/magento/app/design/adminhtml/default/default/layout/hooks.xml
 ln -s /vagrant/module/design/adminhtml/default/default/template/hooks/ /vagrant/www/magento/app/design/adminhtml/default/default/template/hooks
 ```
-Now you can develop inside the `module` folder. All new files created inside `/vagrant/module/app/code/community/Robinhq/` and `/vagrant/module/design/adminhtml/default/default/template/hooks/` will also be inside the Magento installation.
-
-and enable symlinks by going to System -> Configuration -> ADVANCED -> Developer -> Template Settings and set `Allow Symlinks` to `Yes`
+And enable symlinks by going to System -> Configuration -> ADVANCED -> Developer -> Template Settings and set `Allow Symlinks` to `Yes`.
 The idea here is to create a separated folder that only contains the module files and folders and link that to the magento installation. This way your magento installation won't have to be a git repository and you won't have to do some weird .gitignore magic.
+
+Now you can develop inside the `module` folder. All new files created inside `/vagrant/module/app/code/community/Robinhq/` and `/vagrant/module/design/adminhtml/default/default/template/hooks/` will also be inside the Magento installation.
 
 ##License
 The code is licensed under the [Robin End-User Licence Agreement][robin-licence]
