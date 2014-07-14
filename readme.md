@@ -8,16 +8,32 @@ This package is designed as a starting point and a way to show how you could use
 __Make sure you have your Robin API key and API secret. If you don't have the API secret, [You can request it here][request-api-key-secret]. You can also ask the Robin people what your API key is if you don't know where to find it.__
 
 ### Installation
+
+
 - Clone or download this git repo
 - If you downloaded the repo, unpack it
 - Log in to your magento backend
 - Go to System -> Tools -> Backups and click on `System Backup`, this might take a while. Sit back, relax en let Magento do the heavy lifting.
 - Go to System -> Tools -> Compilation and disable compilation if it's enabled. 
 - Go to System -> Cache Management and enable Configuration
+
+From here you can make a choice, if you want to install the package though Magento Connect proceed, if not skip the next steps and follow the steps under __manual  installation__
+
 - Go to System -> Magento Connect -> Magento Connect Manager and log in with your admin credentials
 - Under the field `Direct package file upload` click `Choose file` and browse to the location where you downloaded/cloned this repo and go to `package/0.0.1 alpha` and select the file `Robinhq_Hooks-0.0.1.tgz`
 - Click `Upload` to start the installation process
 - After the installation is completed go back to the admin page
+
+####Manual installation
+
+- Connect to your hosting through FTP and browse to your Mageno root directory.
+- On your local machine, go to the location where you have downloaded the module.
+- Upload the folders `app` and `design` to the root directory of your Magento installation.
+- When your FTP client asks you to override or combine existing folders, choose __combine__! Otherwise your entire Magento installation will be overwritten!
+
+### What's installed?
+
+The module gets installed inside the `app/code/community/Robinhq/Hooks` folder and the package settings file is located inside `app/etc/modules/Robin_Hooks.xml`. The admin design files are: `design/adminhtml/default/default/layout/Hooks.xml` and `design/adminhtml/default/default/template/hooks/hooksbackend.phtml`
 
 ### What's next
 
@@ -249,7 +265,7 @@ The `panel_view` contains a new object of key/value pairs that can be anything. 
 ####Adding more order data to send to Robin
 
 You can extend the data you want to be visible inside Robin by adding key/value pairs to the `list_view` or the `data` arrays each method inside `Robinhq_Hooks_Model_RobinOrder::getDetailsView()` returns. 
-If you want to add complete a new `details_view` like the comments from a order, you can add the logic inside the `Robinhq_Hooks_Model_RobinOrder::getDetailsView()` method like this
+If you want to add a complete new `details_view` like the comments from a order, you can add the logic inside the `Robinhq_Hooks_Model_RobinOrder::getDetailsView()` method like this
 
 ```PHP
 private function getDetailsView(){
@@ -282,7 +298,7 @@ Inside the `data` key you can add an array with objects containing key/value pai
 }
 ```
 
- Note: the content of the key will also be displayed, so be sure to format it nicely.
+ Note: the name of the key will also be displayed, so be sure to format it nicely.
 
 
 
