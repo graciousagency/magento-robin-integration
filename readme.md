@@ -34,6 +34,7 @@ From here you can make a choice, if you want to install the package though Magen
 ### What's installed?
 
 The module gets installed inside the `app/code/community/Robinhq/Hooks` folder and the package settings file is located inside `app/etc/modules/Robin_Hooks.xml`. The admin design files are: `design/adminhtml/default/default/layout/Hooks.xml` and `design/adminhtml/default/default/template/hooks/hooksbackend.phtml`
+The module does not have it's own sql file or database, the api key and secret are saved through Magento's settings magic.
 
 ### What's next
 
