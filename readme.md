@@ -329,10 +329,10 @@ The idea here is to create a separated folder that only contains the module file
 Now you can develop inside the `module` folder. All new files created inside `/vagrant/module/app/code/community/Robinhq/` and `/vagrant/module/design/adminhtml/default/default/template/hooks/` will also be inside the Magento installation.
 
 ##License
-The code is licensed under the [Robin End-User Licence Agreement][robin-licence]
+The code is licensed under the [GPL v3 licence][gpl-v3-licence] 
 
 [magento-vagrant]: http://broderboy.github.io/vagrant-magento-presentation/#/
 [magento-vagrant-github]: https://github.com/matthewsplant/magento-vagrant-puppet
 [request-api-key-secret]: http://docs.robinhq.com/faq/api-secret-request/
 [robin-api]: http://docs.robinhq.com/faq/robin-api/
-[robin-licence]: http://robinhq.com/eula/
+[gpl-v3-licence]: http://choosealicense.com/licenses/gpl-3.0/
