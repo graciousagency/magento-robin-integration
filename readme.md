@@ -41,7 +41,7 @@ The module does not have it's own sql file or database, the api key and secret a
 If you didn't get any errors, that's good! Now log out and back in again to be sure Magento takes note of the changes. You can now turn Compilation back on if you turned it off during installation. Also disable Configuration under Cache Management.
 Again I want to make sure you have your [api key and secret][request-api-key-secret] otherwise the module __won't work!__
 
-Now go to System -> Configuration -> ROBINHQ -> Settings -> API Settings and fill in your API key and API secret. The API base url is already provided for you. After you have filled in both key's click `save config` and you are done! All future orders and customers will be automatically send to Robin when they are created and/or changed.
+Now go to System -> Configuration -> ROBINHQ -> Settings -> API Settings and fill in your API key and API secret. The API base url is already provided for you, as are fields `Seconds to wait` and `Bulk Limit` these settings are there for when you want to to a bulk import. After you have filled in both key's click `save config` and you are done! All future orders and customers will be automatically send to Robin when they are created and/or changed.
 
 ### Initial data
 You might have noticed the new `Robin` tab in your back-end menu bar. This is to send over existing customers and their orders to Robin. To start the process, simply go to Robin -> Mass Send and click on the `Run` button.
