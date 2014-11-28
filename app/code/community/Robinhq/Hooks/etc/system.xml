@@ -7,7 +7,7 @@
         </robinhq>
     </tabs>
     <sections>
-        <settings  translate="label" module="hooks">
+        <settings translate="label" module="hooks">
             <label>Settings</label>
             <tab>robinhq</tab>
             <frontend_type>text</frontend_type>
@@ -52,6 +52,24 @@
                             <show_in_store>1</show_in_store>
                             <comment>Robin API url</comment>
                         </api_url>
+                        <bulk_limit translate="label">
+                            <label>Bulk Limit</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>300</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>The max number of items send to Robin in one api request</comment>
+                        </bulk_limit>
+                        <seconds_to_wait translate="label">
+                            <label>Seconds to wait</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>300</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment>The number of seconds to wait to preform next request</comment>
+                        </seconds_to_wait>
                     </fields>
                 </general>
             </groups>

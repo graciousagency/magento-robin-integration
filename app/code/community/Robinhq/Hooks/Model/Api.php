@@ -4,7 +4,8 @@
  * A small wrapper to communicate with the Robin API.
  * Class Robinhq_Hooks_Model_Api
  */
-class Robinhq_Hooks_Model_Api {
+class Robinhq_Hooks_Model_Api
+{
 
     /**
      * @var Robinhq_Hooks_Model_Logger
@@ -24,7 +25,8 @@ class Robinhq_Hooks_Model_Api {
     /**
      * Gets and sets the dependency's
      */
-    public function __construct(){
+    public function __construct()
+    {
         $this->logger = Mage::getModel('hooks/logger');
         $this->robinCustomer = Mage::getModel('hooks/robinCustomer');
         $this->robinOrder = Mage::getModel('hooks/robinOrder');
@@ -37,13 +39,15 @@ class Robinhq_Hooks_Model_Api {
      * @param $customers
      * @return mixed
      */
-    function customers($customers){
+    public function customers($customers)
+    {
         $robinCustomers = array();
         foreach ($customers as $customer) {
             $robinCustomers[] = $this->toRobinCustomer($customer);
         }
         $this->logger->log("Sending customer to ROBIN");
-        return $this->post('customers', array('customers' => $robinCustomers));
+        return $this->postChunks('customers', $robinCustomers, 15);
+//        return $this->post('customers', array('customers' => $robinCustomers));
     }
 
     /**
@@ -53,15 +57,30 @@ class Robinhq_Hooks_Model_Api {
      * @param $orders
      * @return mixed
      */
-    function orders($orders){
+    public function orders($orders)
+    {
         $robinOrders = array();
-        foreach($orders as $order){
+        foreach ($orders as $order) {
             $robinOrders[] = $this->toRobinOrder($order);
         }
         $this->logger->log("Sending order to ROBIN");
-        return $this->post('orders', array('orders' => $robinOrders));
+        return $this->postChunks("orders", $robinOrders);
+//        return $this->post('orders', array('orders' => $chuckedOrders));
     }
 
+    private function postChunks($request, $data)
+    {
+        $config = Mage::getStoreConfig('settings/general');
+        $numChunks = $config['bulk_limit'];
+        $chunkData = array_chunk($data, $numChunks);
+        $message = '';
+        foreach ($chunkData as $chunk) {
+            sleep($config['seconds_to_wait']);
+            $message = $this->post($request, array($request => $chunk));
+        }
+
+        return $message;
+    }
 
     /**
      * Converts a Mage_Customer_Model_Customer into a simple array
@@ -70,19 +89,21 @@ class Robinhq_Hooks_Model_Api {
      * @param Mage_Customer_Model_Customer $customer
      * @return array
      */
-    function toRobinCustomer(Mage_Customer_Model_Customer $customer){
+    private function toRobinCustomer(Mage_Customer_Model_Customer $customer)
+    {
         return $this->robinCustomer->factory($customer);
     }
 
 
     /**
-     * Converst a Mage_Sales_Model_Order into a array with required key/value pairs and a
+     * Converts a Mage_Sales_Model_Order into a array with required key/value pairs and a
      * example details_view.
      *
      * @param Mage_Sales_Model_Order $order
      * @return array
      */
-    function toRobinOrder(Mage_Sales_Model_Order $order){
+    private function toRobinOrder(Mage_Sales_Model_Order $order)
+    {
         return $this->robinOrder->factory($order);
     }
 
@@ -94,9 +115,10 @@ class Robinhq_Hooks_Model_Api {
      * @throws Exception
      * @return resource
      */
-    function setUpCurl($request){
+    private function setUpCurl($request)
+    {
         $config = Mage::getStoreConfig('settings/general');
-        if(!empty($config['api_key']) && !empty($config['api_secret'])){
+        if (!empty($config['api_key']) && !empty($config['api_secret'])) {
             $url = $config['api_url'] . $request;
             $this->logger->log("Posting to [" . $url . "]");
             $ch = curl_init($url);
@@ -105,7 +127,9 @@ class Robinhq_Hooks_Model_Api {
             curl_setopt($ch, CURLOPT_USERPWD, $config['api_key'] . ":" . $config['api_secret']);
             return $ch;
         }
-        throw new Exception('Missing API configuration, go to System -> Configuration -> ROBINHQ -> Settings and fill in your API credentials');
+        throw new Exception(
+            'Missing API configuration, go to System -> Configuration -> ROBINHQ -> Settings and fill in your API credentials'
+        );
     }
 
     /**
@@ -116,16 +140,21 @@ class Robinhq_Hooks_Model_Api {
      * @throws Exception
      * @return mixed
      */
-    function post($request, $values){
+    private function post($request, $values)
+    {
         $errorCodes = array(500, 400, 401);
         $values = json_encode($values);
         $ch = $this->setUpCurl($request);
         $valuesLength = strlen($values);
         $this->logger->log("Posting with: " . $values);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        curl_setopt(
+            $ch,
+            CURLOPT_HTTPHEADER,
+            array(
                 'Content-Type: application/json',
                 'Content-Length: ' . $valuesLength
-        ));
+            )
+        );
         curl_setopt($ch, CURLOPT_POSTFIELDS, $values);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
@@ -136,7 +165,7 @@ class Robinhq_Hooks_Model_Api {
         $responseInfo = curl_getinfo($ch);
         curl_close($ch);
         if (in_array($responseInfo['http_code'], $errorCodes)) {
-            throw new Exception("Error: 'Robin returned status code " . $responseInfo['http_code']."'");
+            throw new Exception("Error: 'Robin returned status code " . $responseInfo['http_code'] . "'");
         }
 //        $this->logger->debug($responseInfo);
         $this->logger->log("Robin returned status: " . $responseInfo['http_code']);
