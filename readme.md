@@ -1,11 +1,11 @@
 Magento Robin integration
 ==========================================================
 
-This package is designed as a starting point and a way to show how you could use the Robin API in your Magento shop. It currently sends over data to Robin when a customer and/or order is created or updated through the frond- and back-end. The module is tested in Magento 1.7, 1.8 and 1.9.
+This package is designed as a starting point and a way to show how you could use the Robin API in your Magento shop. It currently sends over data to ROBIN when a customer and/or order is created or updated through the frond- and back-end. The module is tested in Magento 1.7, 1.8 and 1.9.
 
 ## Setup
 
-__Make sure you have your Robin API key and API secret. If you don't have the API secret, [You can request it here][request-api-key-secret]. You can also ask the Robin people what your API key is if you don't know where to find it.__
+__Make sure you have your Robin API key and API secret. If you don't have the API secret, [You can request it here][request-api-key-secret]. You can also ask the ROBIN people what your API key is if you don't know where to find it.__
 
 ### Installation
 
