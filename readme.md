@@ -1,23 +1,23 @@
 Magento Robin integration
 ==========================================================
 
-This package is designed as a starting point and a way to show how you could use the Robin API in your Magento shop. It currently sends over data to Robin when a customer and/or order is created or updated through the frond- and back-end. The module is tested in Magento 1.7, 1.8 and 1.9.
+This package is designed as a starting point and a way to show how you could use the ROBIN API in your Magento shop. It currently sends over data to ROBIN when a customer and/or order is created or updated through the front- and back-end. The module is tested in Magento 1.7, 1.8 and 1.9.
 
 ## Setup
 
-__Make sure you have your Robin API key and API secret. If you don't have the API secret, [You can request it here][request-api-key-secret]. You can also ask the Robin people what your API key is if you don't know where to find it.__
+__Make sure you have your ROBIN API key and API secret. If you don't have the API secret, [You can request it here][request-api-key-secret]. You can also ask the ROBIN people what your API key is if you don't know where to find it.__
 
 ### Installation
 
 
-- Clone or download this git repo
+- Clone or download the git repo
 - If you downloaded the repo, unpack it
-- Log in to your magento backend
+- Log in to your Magento backend
 - Go to System -> Tools -> Backups and click on `System Backup`, this might take a while. Sit back, relax en let Magento do the heavy lifting.
 - Go to System -> Tools -> Compilation and disable compilation if it's enabled. 
 - Go to System -> Cache Management and enable Configuration
 
-From here you can make a choice, if you want to install the package though Magento Connect proceed, if not skip the next steps and follow the steps under __manual  installation__
+From here you can make a choice, if you want to install the package though Magento Connect proceed, if not skip the next steps and follow the steps under __manual  installation__.
 
 - Go to System -> Magento Connect -> Magento Connect Manager and log in with your admin credentials
 - Under the field `Direct package file upload` click `Choose file` and browse to the location where you downloaded/cloned this repo and go to `package/0.0.1 alpha` and select the file `Robinhq_Hooks-0.0.1.tgz`
@@ -26,7 +26,7 @@ From here you can make a choice, if you want to install the package though Magen
 
 ####Manual installation
 
-- Connect to your hosting through FTP and browse to your Mageno root directory.
+- Connect to your hosting through FTP and browse to your Magento root directory.
 - On your local machine, go to the location where you have downloaded the module.
 - Upload the folders `app` and `design` to the root directory of your Magento installation.
 - When your FTP client asks you to override or combine existing folders, choose __combine__! Otherwise your entire Magento installation will be overwritten!
@@ -41,13 +41,13 @@ The module does not have it's own sql file or database, the api key and secret a
 If you didn't get any errors, that's good! Now log out and back in again to be sure Magento takes note of the changes. You can now turn Compilation back on if you turned it off during installation. Also disable Configuration under Cache Management.
 Again I want to make sure you have your [api key and secret][request-api-key-secret] otherwise the module __won't work!__
 
-Now go to System -> Configuration -> ROBINHQ -> Settings -> API Settings and fill in your API key and API secret. The API base url is already provided for you, as are fields `Seconds to wait` and `Bulk Limit` these settings are there for when you want to to a bulk import. After you have filled in both key's click `save config` and you are done! All future orders and customers will be automatically send to Robin when they are created and/or changed.
+Now go to System -> Configuration -> ROBINHQ -> Settings -> API Settings and fill in your API key and API secret. The API base url is already provided for you, as are the fields `Seconds to wait` and `Bulk Limit` these settings are there for when you want to do a bulk import. After you have filled in both keys click `save config` and you are done! All future orders and customers will be automatically send to ROBIN when they are created and/or changed.
 
 ### Initial data
-You might have noticed the new `Robin` tab in your back-end menu bar. This is to send over existing customers and their orders to Robin. To start the process, simply go to Robin -> Mass Send and click on the `Run` button.
+You might have noticed the new `Robin` tab in your back-end menu bar. This is to send over existing customers and their orders to ROBIN. To start the process, simply go to Robin -> Mass Send and click on the `Run` button.
 
 ### Warnings and Logging
-By default the package will log what's happening and give the admin page notifications when something went good or bad. To see the log file, log in to your web server through ssh and navigate to your magento root folder.
+By default the package will log what's happening and give the admin page notifications when something went good or bad. To see the log file, log in to your web server through ssh and navigate to your Magento root folder.
 
 To see the contents of the log file do the following
 ```BASH
