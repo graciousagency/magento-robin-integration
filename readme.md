@@ -61,6 +61,7 @@ cd /your/magento/root
 cd var/log/
 tail -f Robinhq_hooks.log
 ```
+Be sure you have logging enabled in the developer settings from Magento.
 
 ## Development
 
@@ -258,9 +259,18 @@ This method goes through all customers given to it and maps them to a RobinCusto
       {
          "Orders":  "12",
          "Total_spent":  "$154.95",
-      }
+      },
+      // optional fields, send by default
+      "name" => "John Doe,
+      "currency" => "EUR",
+      "phone_number" => "0612345678,
+      "twitter_name" => johnDoe
 }
 ```
+
+The ROBIN API documentation also talks about optional data. This package also sends those fields by default. To be 
+able to send the twitter name of a client, this package registers the new "twitter name" label for the customer.
+ 
 The `panel_view` contains a new object of key/value pairs that can be anything. As an example I've added the total orders and the total spent. How to use the panel_view array is explained in the [Robin API][robin-api] documentation.
 
 ####Adding more order data to send to Robin
