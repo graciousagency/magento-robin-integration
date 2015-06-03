@@ -157,7 +157,7 @@ To generate a RobinOrder the method `Robinhq_Hooks_Model_RobinOrder::factory()` 
       "email_address":  "email@address.com",
       "order_number":  "RHQO1234",
       "url":  "http://shop.com/order/RHQO1234",
-      "order_by_date" : "2014/01/29"
+      "order_by_date" : "2014/01/29",
       "list_view": 
       {
          "order_number":  "RHQO1234",
@@ -262,7 +262,7 @@ This method goes through all customers given to it and maps them to a RobinCusto
       },
       "name": "John Doe",
       "currency":"EUR",
-      "phone_number":"0612345678,
+      "phone_number":"0612345678",
       "twitter_name":"johnDoe"
 }
 ```
