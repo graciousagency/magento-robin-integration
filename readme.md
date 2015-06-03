@@ -157,7 +157,7 @@ To generate a RobinOrder the method `Robinhq_Hooks_Model_RobinOrder::factory()` 
       "email_address":  "email@address.com",
       "order_number":  "RHQO1234",
       "url":  "http://shop.com/order/RHQO1234",
-      "order_by_date" : "2014/01/29"
+      "order_by_date" : "2014/01/29",
       "list_view": 
       {
          "order_number":  "RHQO1234",
@@ -262,13 +262,13 @@ This method goes through all customers given to it and maps them to a RobinCusto
       },
       "name": "John Doe",
       "currency":"EUR",
-      "phone_number":"0612345678,
+      "phone_number":"0612345678",
       "twitter_name":"johnDoe"
 }
 ```
 
-The ROBIN API documentation also talks about optional data. This package also sends those fields by default. To be 
-able to send the twitter name of a client, this package registers the new "twitter name" label for the customer.
+The ROBIN API documentation also talks about optional data. This package sends those fields by default. To be 
+able to send the twitter name of a client, the new "twitter name" label for the customer is created on installation.
  
 The `panel_view` contains a new object of key/value pairs that can be anything. As an example I've added the total orders and the total spent. How to use the panel_view array is explained in the [Robin API][robin-api] documentation.
 
