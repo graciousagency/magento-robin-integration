@@ -55,7 +55,7 @@ class Robinhq_Hooks_Model_RobinCustomer
             "name" => $this->customer->getName(),
             "currency" => Mage::app()->getStore()->getCurrentCurrencyCode(),
             "phone_number" => $phoneNumber,
-            "twitter_handler" => $twitterHandler
+            "twitter_name" => $twitterHandler
 
         );
 
