@@ -1,12 +1,13 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: bwubs
  * Date: 16/06/14
  * Time: 17:10
  */
-
-class Robinhq_Hooks_Model_RobinCustomer {
+class Robinhq_Hooks_Model_RobinCustomer
+{
 
     /**
      * @var Mage_Customer_Model_Customer
@@ -20,7 +21,8 @@ class Robinhq_Hooks_Model_RobinCustomer {
      * @param Mage_Customer_Model_Customer $customer
      * @return array
      */
-    public function factory(Mage_Customer_Model_Customer $customer){
+    public function factory(Mage_Customer_Model_Customer $customer)
+    {
         $this->customer = $customer;
         return $this->make();
     }
@@ -31,9 +33,14 @@ class Robinhq_Hooks_Model_RobinCustomer {
      *
      * @return array
      */
-    private function make(){
+    private function make()
+    {
         $lifetime = $this->getLifeTimeSalesCustomer();
         $formattedTotalSpend = Mage::helper('core')->currency($lifetime->getLifetime(), true, false);
+
+        $twitterHandler = $this->getTwitterHandler();
+
+        $phoneNumber = $this->getCustomerPhoneNumber();
 
         $robinCustomer = array(
             "email_address" => $this->customer->getEmail(),
@@ -41,12 +48,18 @@ class Robinhq_Hooks_Model_RobinCustomer {
             "order_count" => $lifetime->getNumOrders(),
             "total_spent" => $formattedTotalSpend,
             "panel_view" => array(
-                "Orders" => (string) $lifetime->getNumOrders(),
+                "Orders" => (string)$lifetime->getNumOrders(),
                 "Total_spent" => $formattedTotalSpend
-            )
+            ),
+            //optional data
+            "name" => $this->customer->getName(),
+            "currency" => Mage::app()->getStore()->getCurrentCurrencyCode(),
+            "phone_number" => $phoneNumber,
+            "twitter_handler" => $twitterHandler
+
         );
 
-        return  $robinCustomer;
+        return $robinCustomer;
     }
 
     /**
@@ -54,10 +67,39 @@ class Robinhq_Hooks_Model_RobinCustomer {
      *
      * @return array
      */
-    function getLifeTimeSalesCustomer(){
+    function getLifeTimeSalesCustomer()
+    {
         return Mage::getResourceModel('sales/sale_collection')
             ->setCustomerFilter($this->customer)
             ->load()
             ->getTotals();
+    }
+
+    /**
+     * @return string
+     *
+     * Returns the phone number. When getBillingTelephone returns null
+     * it loads the default billing address and retrieves the telephone
+     * number from there.
+     */
+    private function getCustomerPhoneNumber()
+    {
+        $phoneNumber = $this->customer->getBillingTelephone();
+        return ($phoneNumber === null) ?
+            Mage::getModel('customer/address')->load
+            (
+                $this->customer->getDefaultBilling()
+            )->getTelephone() : $phoneNumber;
+    }
+
+    /**
+     * @return string
+     *
+     * Returns the twitter handler
+     */
+    private function getTwitterHandler()
+    {
+        return ($this->customer->getTwitterHandler() === null) ? "" : $this->customer->getTwitterHandler();
+
     }
 } 

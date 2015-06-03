@@ -22,6 +22,27 @@
                 <resourceModel>hooks_mysql4</resourceModel>
             </hooks>
         </models>
+        <resources>
+            <customerattribute1433318226_setup>
+                <setup>
+                    <module>Robinhq_Hooks</module>
+                    <class>Mage_Customer_Model_Entity_Setup</class>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </customerattribute1433318226_setup>
+            <customerattribute1433318226_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </customerattribute1433318226_write>
+            <customerattribute1433318226_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </customerattribute1433318226_read>
+        </resources>
         <events>
             <customer_save_after> <!-- identifier of the event we want to catch -->
                 <observers>
@@ -128,7 +149,13 @@
                 <api_url>https://api.robinhq.com/</api_url>
                 <bulk_limit>15</bulk_limit>
                 <seconds_to_wait>2</seconds_to_wait>
+
             </general>
+            <!--<optional>-->
+            <!--<send_optional_fields>-->
+            <!---->
+            <!--</send_optional_fields>-->
+            <!--</optional>-->
         </settings>
     </default>
 </config> 

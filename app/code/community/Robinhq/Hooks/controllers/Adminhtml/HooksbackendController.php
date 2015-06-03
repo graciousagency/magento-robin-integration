@@ -14,21 +14,25 @@ class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Cont
     /**
      * Sets up $this->helper
      */
-    private function init(){
+    private function init()
+    {
         $this->helper = Mage::helper('hooks');
     }
 
     /**
      * Before the index is rendered
      */
-    private function beforeRenderIndex(){
+    private function beforeRenderIndex()
+    {
         $this->_title($this->__("Robin"));
         $block = $this->getLayout()
             ->createBlock('adminhtml/widget_button', 'massImportButton')
-            ->setData(array(
-                    'label'     => Mage::helper('adminhtml')->__('Run'),
-                    'onclick'   => "setLocation('{$this->getUrl('*/adminhtml_hooksbackend/run')}')"
-                ));
+            ->setData(
+                array(
+                    'label' => Mage::helper('adminhtml')->__('Run'),
+                    'onclick' => "setLocation('{$this->getUrl('*/adminhtml_hooksbackend/run')}')"
+                )
+            );
         $this->_addContent($block);
         $this->_setActiveMenu('robinhq/hooks');
     }
@@ -42,22 +46,21 @@ class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Cont
     }
 
     /**
-     * Gets ran when the user clicks the 'run' button on the page.
+     * Runs when the user clicks the 'run' button on the page.
      * Sends all customers and orders to Robin.
      */
     public function runAction()
     {
         $this->init();
         $this->helper->log("Robin Mass Importer Started");
-        try{
+        try {
             $this->helper->sendCustomers();
             $this->helper->sendOrders();
             $this->helper->log("Robin Mass Importer Finished");
-            $this->helper->noticeAdmin("Successfully send all customers and orders");
-        }
-        catch(Exception $e){
+            $this->helper->noticeAdmin("Successfully send all customers and orders!!");
+        } catch (Exception $e) {
             $this->helper->warnAdmin($e->getMessage());
-            $this->helper->log("Mass send failed with message: ". $e->getMessage());
+            $this->helper->log("Mass send failed with message: " . $e->getMessage());
         }
         $this->_redirect('*/adminhtml_hooksbackend/index');
     }

@@ -19,7 +19,8 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Gets and sets the dependency's
      */
-    public function __construct(){
+    public function __construct()
+    {
         $this->api = Mage::getModel('hooks/api');
         $this->logger = Mage::getModel('hooks/logger');
     }
@@ -27,7 +28,8 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Sends all orders to the Robin API.
      */
-    public function sendOrders(){
+    public function sendOrders()
+    {
         $collection = Mage::getModel('sales/order')->getCollection();
 //        $this->helper->log($collection->count());
         $this->api->orders($collection);
@@ -36,11 +38,14 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Sends all customers to the Robin API.
      */
-    public function sendCustomers(){
+    public function sendCustomers()
+    {
         $collection = Mage::getResourceModel('customer/customer_collection')
             ->addNameToSelect()
             ->addAttributeToSelect('email')
-            ->addAttributeToSelect('created_at');
+            ->joinAttribute('billing_telephone', 'customer_address/telephone', 'default_billing', null, 'left')
+            ->addAttributeToSelect('created_at')
+            ->addAttributeToSelect('twitter_handler');
 
         $this->api->customers($collection);
     }
@@ -48,30 +53,36 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @param $message
      */
-    public function log($message){
+    public function log($message)
+    {
         $this->logger->log($message);
     }
 
     /**
      * @return Robinhq_Hooks_Model_Api
      */
-    public function getApi(){
+    public function getApi()
+    {
         return $this->api;
     }
 
-    public function getLogger(){
+    public function getLogger()
+    {
         return $this->logger;
     }
 
-    public static function warnAdmin($warning){
+    public static function warnAdmin($warning)
+    {
         Mage::getSingleton('adminhtml/session')->addWarning("Robin: " . $warning);
     }
 
-    public static function noticeAdmin($notice){
+    public static function noticeAdmin($notice)
+    {
         Mage::getSingleton('adminhtml/session')->addSuccess("Robin: " . $notice);
     }
 
-    public static function formatPrice($price){
+    public static function formatPrice($price)
+    {
         return Mage::helper('core')->currency($price, true, false);
     }
 }

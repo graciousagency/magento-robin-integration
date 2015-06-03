@@ -119,12 +119,13 @@ class Robinhq_Hooks_Model_Api
     {
         $config = Mage::getStoreConfig('settings/general');
         if (!empty($config['api_key']) && !empty($config['api_secret'])) {
-            $url = $config['api_url'] . $request;
+            $url = $config['api_url'] . '/' . $request;
             $this->logger->log("Posting to [" . $url . "]");
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_USERPWD, $config['api_key'] . ":" . $config['api_secret']);
+
             return $ch;
         }
         throw new Exception(
@@ -160,9 +161,11 @@ class Robinhq_Hooks_Model_Api
 
         if (curl_exec($ch) === false) {
             curl_close($ch);
-            throw new Exception("Error: 'Request to Robin failed'");
+            throw new Exception("Error: 'Unable to preform request to Robin, request was not executed.'");
         }
+
         $responseInfo = curl_getinfo($ch);
+
         curl_close($ch);
         if (in_array($responseInfo['http_code'], $errorCodes)) {
             throw new Exception("Error: 'Robin returned status code " . $responseInfo['http_code'] . "'");

@@ -16,10 +16,12 @@ class Robinhq_Hooks_Model_Observer
      * @var Robinhq_Hooks_Helper_Data
      */
     private $helper;
+
     /**
      * Gets and sets the dependency's
      */
-    public function __construct(){
+    public function __construct()
+    {
         $this->helper = Mage::helper("hooks");
         $this->api = $this->helper->getApi();
     }
@@ -47,13 +49,12 @@ class Robinhq_Hooks_Model_Observer
     public function orderPlacedHook(Varien_Event_Observer $observer)
     {
         $order = $observer->getEvent()->getOrder();
-        if($order){
+        if ($order) {
             $this->helper->log("New order placed with id: " . $order->getId());
-            try{
+            try {
                 $this->api->orders(array($order));
-            }
-            catch(Exception $e){
-                $this->helper->log("Exception: ". $e->getMessage());
+            } catch (Exception $e) {
+                $this->helper->log("Exception: " . $e->getMessage());
                 $this->helper->warnAdmin($e->getMessage());
             }
         }
@@ -72,17 +73,16 @@ class Robinhq_Hooks_Model_Observer
         $order = $observer->getEvent()->getOrder();
         $status = $order->getStatus();
         $this->helper->log($status);
-        if(is_string($status)){ //only fire when we actually have an status
+        if (is_string($status)) { //only fire when we actually have an status
             $string = "The status of order #" . $order->getIncrementId() . " chanced to: " . $order->getStatus();
             $this->helper->log($string);
-            try{
+            try {
                 $this->api->orders(array($order));
                 $this->helper->log("Order has changed, sending updated customer info to Robin");
                 $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
                 $this->_customerHook($customer);
-            }
-            catch(Exception $e){
-                $this->helper->log("Exception: ". $e->getMessage());
+            } catch (Exception $e) {
+                $this->helper->log("Exception: " . $e->getMessage());
                 $this->helper->warnAdmin($e->getMessage());
             }
         }
@@ -103,7 +103,6 @@ class Robinhq_Hooks_Model_Observer
                 $this->helper->log("Exception: " . $e->getMessage());
                 $this->helper->warnAdmin($e->getMessage());
             }
-
         }
     }
 
