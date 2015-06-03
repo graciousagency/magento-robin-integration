@@ -260,11 +260,10 @@ This method goes through all customers given to it and maps them to a RobinCusto
          "Orders":  "12",
          "Total_spent":  "$154.95",
       },
-      // optional fields, send by default
-      "name" => "John Doe,
-      "currency" => "EUR",
-      "phone_number" => "0612345678,
-      "twitter_name" => johnDoe
+      "name": "John Doe",
+      "currency":"EUR",
+      "phone_number":"0612345678,
+      "twitter_name":"johnDoe"
 }
 ```
 
