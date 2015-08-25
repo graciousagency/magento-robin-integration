@@ -80,17 +80,23 @@ class Robinhq_Hooks_Model_RobinCustomer
      *
      * Returns the phone number. When getBillingTelephone returns null
      * it loads the default billing address and retrieves the telephone
-     * number from there.
+     * number from there. When both are null, it'll return an emtpy string.
      */
     private function getCustomerPhoneNumber()
     {
         $phoneNumber = $this->customer->getBillingTelephone();
-        return ($phoneNumber === null) ?
-            Mage::getModel('customer/address')->load
-            (
-                $this->customer->getDefaultBilling()
-            )->getTelephone() : $phoneNumber;
+        $phoneNumber = ($phoneNumber !== null) ? $phoneNumber : $this->getPhoneNumberFromBilling();
+
+        return ($phoneNumber === null) ? "" : $phoneNumber;
     }
+
+    private function getPhoneNumberFromBilling(){
+        $address = Mage::getModel('customer/address');
+        $billing = $address->load($this->customer->getDefaultBilling());
+        $phone = $billing->getTelephone();
+
+        return $phone;
+    }   
 
     /**
      * @return string
