@@ -31,7 +31,6 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract
     public function sendOrders()
     {
         $collection = Mage::getModel('sales/order')->getCollection();
-//        $this->helper->log($collection->count());
         $this->api->orders($collection);
     }
 
@@ -46,7 +45,6 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract
             ->joinAttribute('billing_telephone', 'customer_address/telephone', 'default_billing', null, 'left')
             ->addAttributeToSelect('created_at')
             ->addAttributeToSelect('twitter_handler');
-
         $this->api->customers($collection);
     }
 
