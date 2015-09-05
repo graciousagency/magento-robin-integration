@@ -8,14 +8,22 @@ class Robinhq_Hooks_Model_Observer
 {
 
     /**
+     * @var Robinhq_Hooks_Model_Queue
+     */
+    private $push;
+
+    /**
      * @var Robinhq_Hooks_Model_Api
      */
     private $api;
+
 
     /**
      * @var Robinhq_Hooks_Helper_Data
      */
     private $helper;
+
+    private $enabled;
 
     /**
      * Gets and sets the dependency's
@@ -23,7 +31,9 @@ class Robinhq_Hooks_Model_Observer
     public function __construct()
     {
         $this->helper = Mage::helper("hooks");
+        $this->push = $this->helper->getQueue();
         $this->api = $this->helper->getApi();
+        $this->enabled = $this->isEnabled();
     }
 
 
@@ -32,12 +42,26 @@ class Robinhq_Hooks_Model_Observer
      * This happens when a customer is created and when an customer places an order.
      * Also fires when a customer is created/edited through the backend.
      *
-     * @param Varien_Event_Observer $observer
+     * @param Varien_Event_Observer|Mage_Customer_Model_Customer $customer
      */
-    public function customerHook(Varien_Event_Observer $observer)
+    public function customerHook($customer)
     {
-        $customer = $observer->getEvent()->getCustomer();
-        $this->_customerHook($customer);
+        if ($this->enabled) {
+            if ($customer instanceof Varien_Event_Observer) {
+                $customer = $customer->getEvent()->getCustomer();
+            }
+
+            if ($customer) {
+                $this->helper->log("user with id: " . $customer->getId() . " chanced");
+                try {
+                    $this->helper->log("Customer save");
+                    $this->api->customer($customer);
+                } catch (PDOException $e) {
+                    $this->helper->log("Exception: " . $e->getMessage());
+                    $this->helper->warnAdmin($e->getMessage());
+                }
+            }
+        }
     }
 
     /**
@@ -48,17 +72,19 @@ class Robinhq_Hooks_Model_Observer
      */
     public function orderPlacedHook(Varien_Event_Observer $observer)
     {
-        $order = $observer->getEvent()->getOrder();
-        if ($order) {
-            $this->helper->log("New order placed with id: " . $order->getId());
-            try {
-                $this->api->orders(array($order));
-            } catch (Exception $e) {
-                $this->helper->log("Exception: " . $e->getMessage());
-                $this->helper->warnAdmin($e->getMessage());
+        if ($this->enabled) {
+            /** @var Mage_Sales_Model_Order $order */
+            $order = $observer->getEvent()->getOrder();
+            if ($order) {
+                $this->helper->log("New order placed with id: " . $order->getId());
+                try {
+                    $this->api->order($order);
+                } catch (Exception $e) {
+                    $this->helper->log("Exception: " . $e->getMessage());
+                    $this->helper->warnAdmin($e->getMessage());
+                }
             }
         }
-
     }
 
     /**
@@ -70,40 +96,29 @@ class Robinhq_Hooks_Model_Observer
      */
     public function orderStatusChanceHook(Varien_Event_Observer $observer)
     {
-        $order = $observer->getEvent()->getOrder();
-        $status = $order->getStatus();
-        $this->helper->log($status);
-        if (is_string($status)) { //only fire when we actually have an status
-            $string = "The status of order #" . $order->getIncrementId() . " chanced to: " . $order->getStatus();
-            $this->helper->log($string);
-            try {
-                $this->api->orders(array($order));
-                $this->helper->log("Order has changed, sending updated customer info to Robin");
-                $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
-                $this->_customerHook($customer);
-            } catch (Exception $e) {
-                $this->helper->log("Exception: " . $e->getMessage());
-                $this->helper->warnAdmin($e->getMessage());
+        if ($this->enabled) {
+            $order = $observer->getEvent()->getOrder();
+            $status = $order->getStatus();
+            if (is_string($status)) { //only fire when we actually have an status
+                $string = "The status of order #" . $order->getIncrementId() . " chanced to: " . $order->getStatus();
+                $this->helper->log($string);
+                try {
+                    $this->helper->log("Order has changed, putting it on the queue to be send to Robin");
+                    $this->api->order($order);
+                    /** @var Mage_Customer_Model_Customer $customer */
+                    $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
+                    $this->customerHook($customer);
+                } catch (Exception $e) {
+                    $this->helper->log("Exception: " . $e->getMessage());
+                    $this->helper->warnAdmin($e->getMessage());
+                }
             }
         }
-
     }
 
-
-    /**
-     * @param Mage_Customer_Model_Customer $customer
-     */
-    private function _customerHook(Mage_Customer_Model_Customer $customer)
+    private function isEnabled()
     {
-        if ($customer) {
-            $this->helper->log("user with id: " . $customer->getId() . " chanced");
-            try {
-                $this->api->customers(array($customer));
-            } catch (Exception $e) {
-                $this->helper->log("Exception: " . $e->getMessage());
-                $this->helper->warnAdmin($e->getMessage());
-            }
-        }
+        $config = Mage::getStoreConfig('settings/general');
+        return $config['enabled'];
     }
-
 }

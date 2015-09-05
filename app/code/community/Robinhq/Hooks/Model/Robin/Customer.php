@@ -6,13 +6,15 @@
  * Date: 16/06/14
  * Time: 17:10
  */
-class Robinhq_Hooks_Model_RobinCustomer
+class Robinhq_Hooks_Model_Robin_Customer
 {
 
     /**
      * @var Mage_Customer_Model_Customer
      */
     private $customer;
+
+    private $data;
 
     /**
      * Factory method for creating an array with key/value pairs
@@ -24,6 +26,7 @@ class Robinhq_Hooks_Model_RobinCustomer
     public function factory(Mage_Customer_Model_Customer $customer)
     {
         $this->customer = $customer;
+
         return $this->make();
     }
 
@@ -36,13 +39,14 @@ class Robinhq_Hooks_Model_RobinCustomer
     private function make()
     {
         $lifetime = $this->getLifeTimeSalesCustomer();
+
         $formattedTotalSpend = Mage::helper('core')->currency($lifetime->getLifetime(), true, false);
 
         $twitterHandler = $this->getTwitterHandler();
 
         $phoneNumber = $this->getCustomerPhoneNumber();
 
-        $robinCustomer = array(
+        $this->data = array(
             "email_address" => $this->customer->getEmail(),
             "customer_since" => Mage::getModel('core/date')->date('Y-m-d', strtotime($this->customer->getCreatedAt())),
             "order_count" => $lifetime->getNumOrders(),
@@ -59,7 +63,7 @@ class Robinhq_Hooks_Model_RobinCustomer
 
         );
 
-        return $robinCustomer;
+        return $this->data;
     }
 
     /**
@@ -67,10 +71,10 @@ class Robinhq_Hooks_Model_RobinCustomer
      *
      * @return array
      */
-    function getLifeTimeSalesCustomer()
+    public function getLifeTimeSalesCustomer()
     {
         return Mage::getResourceModel('sales/sale_collection')
-            ->setCustomerFilter($this->customer)
+            ->setCustomerFilter($this->customer)->setOrderStateFilter(Mage_Sales_Model_Order::STATE_CANCELED, true)
             ->load()
             ->getTotals();
     }
@@ -102,4 +106,5 @@ class Robinhq_Hooks_Model_RobinCustomer
         return ($this->customer->getTwitterHandler() === null) ? "" : $this->customer->getTwitterHandler();
 
     }
-} 
+
+}

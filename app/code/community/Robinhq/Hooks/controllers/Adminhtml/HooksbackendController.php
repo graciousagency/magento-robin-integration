@@ -17,6 +17,8 @@ class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Cont
     private function init()
     {
         $this->helper = Mage::helper('hooks');
+        $config = Mage::getStoreConfig('settings/general');
+        return $config['enabled'];
     }
 
     /**
@@ -51,16 +53,27 @@ class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Cont
      */
     public function runAction()
     {
-        $this->init();
-        $this->helper->log("Robin Mass Importer Started");
-        try {
-            $this->helper->sendCustomers();
-            $this->helper->sendOrders();
-            $this->helper->log("Robin Mass Importer Finished");
-            $this->helper->noticeAdmin("Successfully send all customers and orders!!");
-        } catch (Exception $e) {
-            $this->helper->warnAdmin($e->getMessage());
-            $this->helper->log("Mass send failed with message: " . $e->getMessage());
+        if ($this->init()) {
+            $this->helper->log("Robin Mass Sender started queueing up customers and orders");
+            try {
+                $this->helper->sendCustomers();
+                $this->helper->sendOrders();
+                $this->helper->log(
+                    "Robin Mass Sender finished building the queue. Wait unitll the queue kicks in and
+            handles the jobs"
+                );
+                $this->helper->noticeAdmin(
+                    "All customers and orders are send to the queue. Depending on your cron
+            settings, they'll soon be send to ROBIN"
+                );
+            } catch (Exception $e) {
+                $this->helper->warnAdmin($e->getMessage());
+                $this->helper->log("Mass send failed with message: " . $e->getMessage());
+            }
+        } else {
+            $message = "Module is disabled. Please enable it first.";
+            $this->helper->warnAdmin($message);
+            $this->helper->log($message);
         }
         $this->_redirect('*/adminhtml_hooksbackend/index');
     }

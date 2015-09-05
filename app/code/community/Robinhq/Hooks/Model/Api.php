@@ -13,23 +13,21 @@ class Robinhq_Hooks_Model_Api
     private $logger;
 
     /**
-     * @var Robinhq_Hooks_Model_RobinCustomer
-     */
-    private $robinCustomer;
-
-    /**
-     * @var Robinhq_Hooks_Model_RobinOrder
-     */
-    private $robinOrder;
-
-    /**
      * Gets and sets the dependency's
      */
     public function __construct()
     {
         $this->logger = Mage::getModel('hooks/logger');
-        $this->robinCustomer = Mage::getModel('hooks/robinCustomer');
-        $this->robinOrder = Mage::getModel('hooks/robinOrder');
+    }
+
+    public function customer($customer)
+    {
+        return $this->customers(array($customer));
+    }
+
+    public function order($order)
+    {
+        return $this->orders(array($order));
     }
 
     /**
@@ -41,13 +39,8 @@ class Robinhq_Hooks_Model_Api
      */
     public function customers($customers)
     {
-        $robinCustomers = array();
-        foreach ($customers as $customer) {
-            $robinCustomers[] = $this->toRobinCustomer($customer);
-        }
-        $this->logger->log("Sending customer to ROBIN");
-        return $this->postChunks('customers', $robinCustomers, 15);
-//        return $this->post('customers', array('customers' => $robinCustomers));
+        $this->logger->log("Sending customers to ROBIN");
+        return $this->post('customers', $customers);
     }
 
     /**
@@ -59,52 +52,8 @@ class Robinhq_Hooks_Model_Api
      */
     public function orders($orders)
     {
-        $robinOrders = array();
-        foreach ($orders as $order) {
-            $robinOrders[] = $this->toRobinOrder($order);
-        }
-        $this->logger->log("Sending order to ROBIN");
-        return $this->postChunks("orders", $robinOrders);
-//        return $this->post('orders', array('orders' => $chuckedOrders));
-    }
-
-    private function postChunks($request, $data)
-    {
-        $config = Mage::getStoreConfig('settings/general');
-        $numChunks = $config['bulk_limit'];
-        $chunkData = array_chunk($data, $numChunks);
-        $message = '';
-        foreach ($chunkData as $chunk) {
-            sleep($config['seconds_to_wait']);
-            $message = $this->post($request, array($request => $chunk));
-        }
-
-        return $message;
-    }
-
-    /**
-     * Converts a Mage_Customer_Model_Customer into a simple array
-     * with key/value pairs that are required by the Robin API.
-     *
-     * @param Mage_Customer_Model_Customer $customer
-     * @return array
-     */
-    private function toRobinCustomer(Mage_Customer_Model_Customer $customer)
-    {
-        return $this->robinCustomer->factory($customer);
-    }
-
-
-    /**
-     * Converts a Mage_Sales_Model_Order into a array with required key/value pairs and a
-     * example details_view.
-     *
-     * @param Mage_Sales_Model_Order $order
-     * @return array
-     */
-    private function toRobinOrder(Mage_Sales_Model_Order $order)
-    {
-        return $this->robinOrder->factory($order);
+        $this->logger->log("Sending orders to ROBIN");
+        return $this->post("orders", $orders);
     }
 
     /**
@@ -138,13 +87,62 @@ class Robinhq_Hooks_Model_Api
      *
      * @param $request
      * @param $values
-     * @throws Exception
      * @return mixed
+     * @throws Exception
+     * @throws Robinhq_Hooks_Model_Exception_BadRequestException
+     * @throws Robinhq_Hooks_Model_Exception_RateLimitReachedException
+     * @throws Robinhq_Hooks_Model_Exception_RequestImpossibleException
+     * @throws Robinhq_Hooks_Model_Exception_UnauthorizedException
+     * @throws Robinhq_Hooks_Model_Exception_UnknownStatusCodeException
      */
     private function post($request, $values)
     {
-        $errorCodes = array(500, 400, 401);
-        $values = json_encode($values);
+        $errorCodes = $this->getErrorCodes();
+
+        $ch = $this->prepare($request, $values);
+
+        $responseInfo = $this->execute($ch);
+
+        $this->logger->log("Robin returned status: " . $responseInfo['http_code']);
+
+        if (in_array($responseInfo['http_code'], $errorCodes)) {
+            $error = Robinhq_Hooks_Model_Exception_RequestFailed::factory($responseInfo['http_code']);
+            $this->logger->log($error->getMessage());
+            throw $error;
+        }
+
+
+        return $responseInfo;
+    }
+
+    /**
+     * @param $ch
+     * @return mixed
+     * @throws Robinhq_Hooks_Model_Exception_RequestImpossibleException
+     */
+    private function execute($ch)
+    {
+        if (curl_exec($ch) === false) {
+            curl_close($ch);
+            throw new Robinhq_Hooks_Model_Exception_RequestImpossibleException(
+                "Error: 'Unable to preform request to Robin, request was not executed.'"
+            );
+        }
+
+        $responseInfo = curl_getinfo($ch);
+        curl_close($ch);
+        return $responseInfo;
+    }
+
+    /**
+     * @param $request
+     * @param $values
+     * @return resource
+     * @throws Exception
+     */
+    private function prepare($request, $values)
+    {
+        $values = json_encode(array($request => $values));
         $ch = $this->setUpCurl($request);
         $valuesLength = strlen($values);
         $this->logger->log("Posting with: " . $values);
@@ -158,22 +156,23 @@ class Robinhq_Hooks_Model_Api
         );
         curl_setopt($ch, CURLOPT_POSTFIELDS, $values);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        return $ch;
+    }
 
-        if (curl_exec($ch) === false) {
-            curl_close($ch);
-            throw new Exception("Error: 'Unable to preform request to Robin, request was not executed.'");
-        }
+    /**
+     * @return array
+     */
+    private function getErrorCodes()
+    {
+        $codes = new Robinhq_Hooks_Model_Robin_StatusCode();
 
-        $responseInfo = curl_getinfo($ch);
-
-        curl_close($ch);
-        if (in_array($responseInfo['http_code'], $errorCodes)) {
-            throw new Exception("Error: 'Robin returned status code " . $responseInfo['http_code'] . "'");
-        }
-//        $this->logger->debug($responseInfo);
-        $this->logger->log("Robin returned status: " . $responseInfo['http_code']);
-
-        return $responseInfo;
+        $errorCodes = array(
+            $codes::INTERNAL_SERVER_ERROR,
+            $codes::BAD_REQUEST,
+            $codes::UNAUTHORIZED,
+            $codes::RATE_LIMIT_EXCEEDED
+        );
+        return $errorCodes;
     }
 
 } 

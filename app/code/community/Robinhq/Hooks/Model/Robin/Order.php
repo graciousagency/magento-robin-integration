@@ -4,7 +4,7 @@
 /**
  * Class Robinhq_Hooks_Model_RobinOrder
  */
-class Robinhq_Hooks_Model_RobinOrder
+class Robinhq_Hooks_Model_Robin_Order
 {
 
     /**
@@ -34,10 +34,11 @@ class Robinhq_Hooks_Model_RobinOrder
      */
     public function factory(Mage_Sales_Model_Order $order)
     {
-        $this->order = $order;
-        $this->helper = Mage::helper('hooks');
-        $this->shipments = $this->order->getShipmentsCollection();
-        return $this->make();
+        $robinOrder = new static;
+        $robinOrder->helper = Mage::helper("hooks");
+        $robinOrder->order = $order;
+        $robinOrder->shipments = $robinOrder->order->getShipmentsCollection();
+        return $robinOrder->make();
     }
 
     /**
@@ -48,9 +49,10 @@ class Robinhq_Hooks_Model_RobinOrder
      */
     private function make()
     {
-        $base = $this->getBaseInfo();
-        $base['details_view'] = $this->getDetailsView();
-        return $base;
+        $data = $this->getBaseInfo();
+        $data['details_view'] = $this->getDetailsView();
+
+        return $data;
     }
 
     /**
@@ -149,7 +151,6 @@ class Robinhq_Hooks_Model_RobinOrder
         $orderStatus = $this->order->getState();
         if ($this->shipments !== false) {
             foreach ($this->shipments as $shipment) {
-                $this->helper->getLogger()->debug($shipment->getData());
                 $url = $this->getShipmentUrl($shipment);
                 $base['data'][] = array(
                     "Shipment:" => "<a target='_blank' href='" . $url . "'>" . $shipment->getIncrementId() . "</a>",
@@ -293,4 +294,5 @@ class Robinhq_Hooks_Model_RobinOrder
                 array('invoice_id' => $invoice->getId(), '_type' => Mage_Core_Model_Store::URL_TYPE_WEB)
             );
     }
-} 
+
+}

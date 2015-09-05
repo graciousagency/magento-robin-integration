@@ -144,6 +144,7 @@
     <default>
         <settings>
             <general>
+                <enabled>0</enabled>
                 <api_key></api_key>
                 <api_secret></api_secret>
                 <api_url>https://api.robinhq.com/</api_url>
