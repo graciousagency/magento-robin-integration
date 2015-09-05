@@ -26,14 +26,20 @@ class Robinhq_Hooks_Model_Observer
     private $enabled;
 
     /**
+     * @var Robinhq_Hooks_Model_Robin_Converter
+     */
+    private $converter;
+
+    /**
      * Gets and sets the dependency's
      */
     public function __construct()
     {
         $this->helper = Mage::helper("hooks");
         $this->push = $this->helper->getQueue();
-        $this->api = $this->helper->getApi();
+        $this->api = Mage::getModel("hooks/api");
         $this->enabled = $this->isEnabled();
+        $this->converter = $this->helper->getConverter();
     }
 
 
@@ -52,9 +58,9 @@ class Robinhq_Hooks_Model_Observer
             }
 
             if ($customer) {
-                $this->helper->log("user with id: " . $customer->getId() . " chanced");
                 try {
-                    $this->helper->log("Customer save");
+                    $this->helper->log("User with id: " . $customer->getId() . " chanced, sending it to ROBIN");
+                    $customer = $this->converter->toRobinCustomer($customer);
                     $this->api->customer($customer);
                 } catch (PDOException $e) {
                     $this->helper->log("Exception: " . $e->getMessage());
@@ -78,6 +84,7 @@ class Robinhq_Hooks_Model_Observer
             if ($order) {
                 $this->helper->log("New order placed with id: " . $order->getId());
                 try {
+                    $order = $this->converter->toRobinOrder($order);
                     $this->api->order($order);
                 } catch (Exception $e) {
                     $this->helper->log("Exception: " . $e->getMessage());
@@ -103,8 +110,9 @@ class Robinhq_Hooks_Model_Observer
                 $string = "The status of order #" . $order->getIncrementId() . " chanced to: " . $order->getStatus();
                 $this->helper->log($string);
                 try {
-                    $this->helper->log("Order has changed, putting it on the queue to be send to Robin");
-                    $this->api->order($order);
+                    $this->helper->log("Order has changed, sending it to Robin");
+                    $robinOrder = $this->converter->toRobinOrder($order);
+                    $this->api->order($robinOrder);
                     /** @var Mage_Customer_Model_Customer $customer */
                     $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
                     $this->customerHook($customer);

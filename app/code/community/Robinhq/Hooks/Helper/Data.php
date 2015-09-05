@@ -140,5 +140,13 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $this->log("Processing " . $collection->count() . " items");
     }
+
+    /**
+     * @return Robinhq_Hooks_Model_Robin_Converter
+     */
+    public function getConverter()
+    {
+        return $this->converter;
+    }
 }
 	 
