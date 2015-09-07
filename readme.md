@@ -3,6 +3,10 @@ Magento Robin integration
 
 This package is designed as a starting point and a way to show how you could use the ROBIN API in your Magento shop. It currently sends over data to ROBIN when a customer and/or order is created or updated through the front- and back-end. The module is tested in Magento 1.7, 1.8 and 1.9.
 
+## Dependency's
+Please ba aware that this package depends upon http://connect20.magentocommerce.com/community/Jowens_JobQueue. Please
+ __install it first__ before installing and using this package, otherwise this package won't be usable.
+
 ## Setup
 
 __Make sure you have your ROBIN API key and API secret. If you don't have the API secret, [You can request it here][request-api-key-secret]. You can also ask the ROBIN people what your API key is if you don't know where to find it.__
