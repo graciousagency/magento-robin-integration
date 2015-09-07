@@ -65,11 +65,18 @@ class Robinhq_Hooks_Model_Robin_Order
      */
     private function getDetailsView()
     {
-        $details = $this->getDetails();
-        $productsOverview = $this->getProductsOverview();
-        $shipments = $this->getShipments();
-        $invoices = $this->getInvoices();
-        return array($details, $productsOverview, $shipments, $invoices);
+        $data = new Varien_Object(
+            array(
+                $this->getDetails(),
+                $this->getProductsOverview(),
+                $this->getShipments(),
+                $this->getInvoices()
+            )
+        );
+
+        Mage::dispatchEvent('robin_hooks_order_details', array('order' => $this, 'data' => $data));
+
+        return $data->toArray();
     }
 
     /**
