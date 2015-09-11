@@ -37,7 +37,7 @@ class Robinhq_Hooks_Model_Observer
     {
         $this->helper = Mage::helper("hooks");
         $this->push = $this->helper->getQueue();
-        $this->api = Mage::getModel("hooks/api");
+        $this->api = $this->helper->getApi();
         $this->enabled = $this->isEnabled();
         $this->converter = $this->helper->getConverter();
     }
@@ -96,7 +96,7 @@ class Robinhq_Hooks_Model_Observer
 
     /**
      * Fires when the sales_order_save_after_handler event is dispatched
-     * and sends the changed order to robin. This event captures all changes made
+     * and sends the changed order to ROBIN. This event captures all changes made
      * to an order. It only sends the order to Robin when it has a status.
      *
      * @param Varien_Event_Observer $observer

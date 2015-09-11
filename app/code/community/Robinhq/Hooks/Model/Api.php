@@ -14,10 +14,11 @@ class Robinhq_Hooks_Model_Api
 
     /**
      * Gets and sets the dependency's
+     * @param Robinhq_Hooks_Model_Logger $logger
      */
-    public function __construct()
+    public function __construct(Robinhq_Hooks_Model_Logger $logger)
     {
-        $this->logger = Mage::getModel('hooks/logger');
+        $this->logger = $logger;
     }
 
     public function customer($customer)

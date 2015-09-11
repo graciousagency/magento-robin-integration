@@ -14,7 +14,7 @@ class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Cont
     /**
      * Sets up $this->helper
      */
-    private function init()
+    private function isEnabled()
     {
         $this->helper = Mage::helper('hooks');
         $config = Mage::getStoreConfig('settings/general');
@@ -31,7 +31,7 @@ class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Cont
             ->createBlock('adminhtml/widget_button', 'massImportButton')
             ->setData(
                 array(
-                    'label' => Mage::helper('adminhtml')->__('Run'),
+                    'label' => Mage::helper('adminhtml')->__('Enqueue the Mass Sender'),
                     'onclick' => "setLocation('{$this->getUrl('*/adminhtml_hooksbackend/run')}')"
                 )
             );
@@ -49,27 +49,20 @@ class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Cont
 
     /**
      * Runs when the user clicks the 'run' button on the page.
-     * Sends all customers and orders to Robin.
+     * It puts the process of retrieving all the customers and orders from the database
+     * and converting them to objects the ROBIN API can understand on the queue. This process
+     * will start as soon as your queue starts processing jobs. The moment your queue initiates
+     * depends on your cron settings. Please, be sure to enable cron.
      */
     public function runAction()
     {
-        if ($this->init()) {
-            $this->helper->log("Robin Mass Sender started queueing up customers and orders");
-            try {
-                $this->helper->sendCustomers();
-                $this->helper->sendOrders();
-                $this->helper->log(
-                    "Robin Mass Sender finished building the queue. Wait unitll the queue kicks in and
-            handles the jobs"
-                );
-                $this->helper->noticeAdmin(
-                    "All customers and orders are send to the queue. Depending on your cron
-            settings, they'll soon be send to ROBIN"
-                );
-            } catch (Exception $e) {
-                $this->helper->warnAdmin($e->getMessage());
-                $this->helper->log("Mass send failed with message: " . $e->getMessage());
-            }
+        if ($this->isEnabled()) {
+            $this->helper->log("Putting the Mass Sender action on the queue");
+            $massQueue = new Robinhq_Hooks_Model_Queue_Mass($this->helper);
+            $massQueue->setName("ROBIN Mass Send");
+            $massQueue->enqueue();
+            $this->helper->log("Done. Wait unitll the queue kicks in and handles this jobs");
+            $this->helper->noticeAdmin("The Mass Send process is pushed to the queue.");
         } else {
             $message = "Module is disabled. Please enable it first.";
             $this->helper->warnAdmin($message);

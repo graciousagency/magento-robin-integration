@@ -24,10 +24,12 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract
 
     private $selectLimit;
 
+    private $api;
+
     /**
-     * @var Robinhq_Hooks_Model_Sender
+     * @var Robinhq_Hooks_Model_Collector
      */
-    private $sender;
+    private $collector;
 
     /**
      * Gets and sets the dependency's
@@ -38,28 +40,13 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract
         $this->bulkLimit = (int)$config['bulk_limit'];
         $this->selectLimit = (int)$config['select_limit'];
 
-        $this->queue = new Robinhq_Hooks_Model_Queue($this->bulkLimit);
         $this->logger = new Robinhq_Hooks_Model_Logger();
+        $this->api = new Robinhq_Hooks_Model_Api($this->logger);
+        $this->queue = new Robinhq_Hooks_Model_Queue($this->logger, $this->api, $this->bulkLimit);
+
         $this->converter = new Robinhq_Hooks_Model_Robin_Converter();
-        $this->sender = new Robinhq_Hooks_Model_Sender($this->queue, $this->converter, $this->selectLimit);
+        $this->collector = new Robinhq_Hooks_Model_Collector($this->queue, $this->converter, $this->selectLimit);
     }
-
-    /**
-     * Sends all orders to the Robin API.
-     */
-    public function sendOrders()
-    {
-        $this->sender->orders();
-    }
-
-    /**
-     * Sends all customers to the Robin API.
-     */
-    public function sendCustomers()
-    {
-        $this->sender->customers();
-    }
-
 
     /**
      * @param $message
@@ -111,6 +98,14 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract
     public function getConverter()
     {
         return $this->converter;
+    }
+
+    /**
+     * @return Robinhq_Hooks_Model_Collector
+     */
+    public function getCollector()
+    {
+        return $this->collector;
     }
 }
 	 

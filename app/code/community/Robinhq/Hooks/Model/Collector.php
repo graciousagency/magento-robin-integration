@@ -1,7 +1,7 @@
 <?php
 
 
-class Robinhq_Hooks_Model_Sender
+class Robinhq_Hooks_Model_Collector
 {
     /**
      * @var Robinhq_Hooks_Model_Queue
@@ -124,6 +124,6 @@ class Robinhq_Hooks_Model_Sender
             $this->iterate($collection, array($this, $callback));
             $collection->clear();
         }
-        $this->queue->done();
+        $this->queue->clear();
     }
 }

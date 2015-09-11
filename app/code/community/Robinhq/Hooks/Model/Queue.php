@@ -25,13 +25,15 @@ class Robinhq_Hooks_Model_Queue
     private $type;
 
     /**
+     * @param Robinhq_Hooks_Model_Logger $logger
+     * @param Robinhq_Hooks_Model_Api $api
      * @param $limit
      */
-    public function __construct($limit)
+    public function __construct(Robinhq_Hooks_Model_Logger $logger, Robinhq_Hooks_Model_Api $api, $limit)
     {
-        $this->logger = Mage::getModel('hooks/logger');
-        $this->api = Mage::getModel("hooks/api");
         $this->limit = $limit;
+        $this->api = $api;
+        $this->logger = $logger;
     }
 
     public function setType($type)
@@ -42,10 +44,15 @@ class Robinhq_Hooks_Model_Queue
     public function push($model)
     {
         $this->models[] = $model;
-        $this->queueWhenBatchLimitIsReached();
+        $this->enqueueWhenBatchLimitIsReached();
     }
 
-    public function done()
+    /**
+     * Enqueue's the remaining items in $this->models,
+     * afterwards it resets the $this->models to an empty array.
+     * It also sets the batch number back to zero
+     */
+    public function clear()
     {
         if (!empty($this->models)) {
             $this->enqueue();
@@ -58,15 +65,20 @@ class Robinhq_Hooks_Model_Queue
     {
         $queueAble = null;
         $message = "Nothing";
-
+        $first = $this->models[0];
+        $last = end($this->models);
+        reset($this->models);
         if ($this->type === static::ORDER) {
-            $queueAble = new Robinhq_Hooks_Model_Queue_Orders($this->models, $this->api);
-            $message = "Orders batch #" . $this->batch++ . " containing " . count($this->models) . " orders";
+            $queueAble = new Robinhq_Hooks_Model_Queue_Orders($this->api, $this->models);
+
+            $message = "Orders batch #" . $this->batch++ . " containing " . count($this->models) . " orders (" .
+                $first['order_number'] . " - " . $last['order_number'] . ")";
         }
 
         if ($this->type === static::CUSTOMER) {
-            $queueAble = new Robinhq_Hooks_Model_Queue_Customers($this->models);
-            $message = "Customers batch #" . $this->batch++ . " containing " . count($this->models) . " customers";
+            $queueAble = new Robinhq_Hooks_Model_Queue_Customers($this->api, $this->models);
+            $message = "Customers batch #" . $this->batch++ . " containing " . count($this->models) . " customers ("
+                . $first['email_address'] . " - " . $last['email_address'] . ")";
         }
 
         if ($queueAble !== null) {
@@ -74,13 +86,13 @@ class Robinhq_Hooks_Model_Queue
             $queueAble->enqueue();
         }
 
-        $this->logger->log($message . " Added to the queue");
+        $this->logger->log($message . " added to the queue");
     }
 
     /**
      * @return bool
      */
-    private function queueWhenBatchLimitIsReached()
+    private function enqueueWhenBatchLimitIsReached()
     {
         if (count($this->models) === $this->limit) {
             $this->enqueue();

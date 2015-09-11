@@ -14,14 +14,14 @@ class Robinhq_Hooks_Model_Queue_Customers extends Jowens_JobQueue_Model_Job_Abst
     private $api;
 
     /**
-     * @param Robinhq_Hooks_Model_Robin_Customer[] $orders
+     * @param Robinhq_Hooks_Model_Api $api
+     * @param Robinhq_Hooks_Model_Robin_Customer[] $customers
      */
-    public function __construct($orders)
+    public function __construct(Robinhq_Hooks_Model_Api $api, $customers)
     {
         parent::__construct();
-        $this->api = Mage::getModel("hooks/api");
-        $this->customers = $orders;
-
+        $this->customers = $customers;
+        $this->api = $api;
     }
 
     public function perform()
