@@ -149,8 +149,7 @@
                 <api_secret></api_secret>
                 <api_url>https://api.robinhq.com/</api_url>
                 <bulk_limit>15</bulk_limit>
-                <seconds_to_wait>2</seconds_to_wait>
-
+                <select_limit>500</select_limit>
             </general>
             <!--<optional>-->
             <!--<send_optional_fields>-->

@@ -71,15 +71,17 @@
                             <show_in_store>1</show_in_store>
                             <comment>The max number of items send to Robin in one api request</comment>
                         </bulk_limit>
-                        <seconds_to_wait translate="label">
-                            <label>Seconds to wait</label>
+                        <select_limit translate="label">
+                            <label>Select Limit</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>300</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>The number of seconds to wait to preform next request</comment>
-                        </seconds_to_wait>
+                            <comment>This value is for collection pagination. If you get memory issues, fill in a
+                                lower value.
+                            </comment>
+                        </select_limit>
                     </fields>
                 </general>
                 <!--<optional>-->
