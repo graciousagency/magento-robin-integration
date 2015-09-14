@@ -69,7 +69,9 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>The max number of items send to Robin in one api request</comment>
+                            <comment>The max number of items to send to Robin in one api request. If you get "Bad
+                                job" errors in the queue, fill in a lower value. We recommend a value between 10 and 20.
+                            </comment>
                         </bulk_limit>
                         <select_limit translate="label">
                             <label>Select Limit</label>
