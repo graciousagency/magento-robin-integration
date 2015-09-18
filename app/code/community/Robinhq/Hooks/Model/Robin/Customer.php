@@ -45,16 +45,13 @@ class Robinhq_Hooks_Model_Robin_Customer
         $twitterHandler = $this->getTwitterHandler();
 
         $phoneNumber = $this->getCustomerPhoneNumber();
-
+        $orderCount = $lifetime->getNumOrders();
         $this->data = array(
             "email_address" => $this->customer->getEmail(),
             "customer_since" => Mage::getModel('core/date')->date('Y-m-d', strtotime($this->customer->getCreatedAt())),
-            "order_count" => $lifetime->getNumOrders(),
+            "order_count" => $orderCount,
             "total_spent" => $formattedTotalSpend,
-            "panel_view" => array(
-                "Orders" => (string)$lifetime->getNumOrders(),
-                "Total_spent" => $formattedTotalSpend
-            ),
+            "panel_view" => array(),
             //optional data
             "name" => $this->customer->getName(),
             "currency" => Mage::app()->getStore()->getCurrentCurrencyCode(),
@@ -94,13 +91,14 @@ class Robinhq_Hooks_Model_Robin_Customer
         return ($phoneNumber === null) ? "" : $phoneNumber;
     }
 
-    private function getPhoneNumberFromBilling(){
+    private function getPhoneNumberFromBilling()
+    {
         $address = Mage::getModel('customer/address');
         $billing = $address->load($this->customer->getDefaultBilling());
         $phone = $billing->getTelephone();
 
         return $phone;
-    }   
+    }
 
     /**
      * @return string
