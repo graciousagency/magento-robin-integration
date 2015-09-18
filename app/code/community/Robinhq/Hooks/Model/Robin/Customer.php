@@ -51,7 +51,6 @@ class Robinhq_Hooks_Model_Robin_Customer
             "customer_since" => Mage::getModel('core/date')->date('Y-m-d', strtotime($this->customer->getCreatedAt())),
             "order_count" => $orderCount,
             "total_spent" => $formattedTotalSpend,
-            "panel_view" => array(),
             //optional data
             "name" => $this->customer->getName(),
             "currency" => Mage::app()->getStore()->getCurrentCurrencyCode(),
