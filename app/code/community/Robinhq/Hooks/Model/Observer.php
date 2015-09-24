@@ -62,7 +62,7 @@ class Robinhq_Hooks_Model_Observer
                     $this->helper->log("User with id: " . $customer->getId() . " chanced, sending it to ROBIN");
                     $customer = $this->converter->toRobinCustomer($customer);
                     $this->api->customer($customer);
-                } catch (PDOException $e) {
+                } catch (Exception $e) {
                     $this->helper->log("Exception: " . $e->getMessage());
                     $this->helper->warnAdmin($e->getMessage());
                 }

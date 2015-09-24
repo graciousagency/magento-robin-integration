@@ -207,11 +207,13 @@ class Robinhq_Hooks_Model_Robin_Order
         $products = array();
         $items = $this->order->getAllItems();
         //All products from this order
+        $taxHelper = Mage::helper('tax');
         foreach ($items as $item) {
+            $price = $taxHelper->getPrice($item, $item->getPrice(), true, null, null, null, null, false);
             $products[] = array(
                 "Product" => $item->getName(),
                 "Quantity" => (int)$item->getQtyOrdered(),
-                "Price" => $this->helper->formatPrice($item->getPrice())
+                "Price" => $this->helper->formatPrice($price)
             );
         }
         return $products;
