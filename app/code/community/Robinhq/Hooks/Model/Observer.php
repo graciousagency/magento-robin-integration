@@ -118,6 +118,7 @@ class Robinhq_Hooks_Model_Observer
                         $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
                         $this->customerHook($customer);
                     }
+
                     // TODO: Implement Guests checkout
                 } catch (Exception $e) {
                     $this->helper->log("Exception: " . $e->getMessage());
