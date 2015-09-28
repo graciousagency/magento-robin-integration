@@ -93,7 +93,7 @@ class Robinhq_Hooks_Model_Robin_Order
             "email_address" => $this->order->getCustomerEmail(),
             "url" => $this->getOrderAdminUrl(),
             "order_by_date" => $orderByDate,
-            "revenue" => $this->order->getGrandTotal(),
+            "revenue" => $this->order->getBaseGrandTotal(),
             "list_view" => array(
                 "order_number" => $this->order->getIncrementId(),
                 "date" => $date,
