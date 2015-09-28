@@ -113,9 +113,12 @@ class Robinhq_Hooks_Model_Observer
                     $this->helper->log("Order has changed, sending it to Robin");
                     $robinOrder = $this->converter->toRobinOrder($order);
                     $this->api->order($robinOrder);
-                    /** @var Mage_Customer_Model_Customer $customer */
-                    $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
-                    $this->customerHook($customer);
+                    if ($order->getCustomerId() !== null) {
+                        /** @var Mage_Customer_Model_Customer $customer */
+                        $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
+                        $this->customerHook($customer);
+                    }
+                    // TODO: Implement Guests checkout
                 } catch (Exception $e) {
                     $this->helper->log("Exception: " . $e->getMessage());
                     $this->helper->warnAdmin($e->getMessage());
