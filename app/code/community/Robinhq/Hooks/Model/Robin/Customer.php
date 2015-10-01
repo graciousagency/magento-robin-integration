@@ -32,7 +32,7 @@ class Robinhq_Hooks_Model_Robin_Customer
 
     /**
      * Makes the array the Robin API expects. If you want more
-     * info in the panel view, just add it in the $robinCustomer['panal_view'] array
+     * info in the panel view, just add it in the $robinCustomer['panel_view'] array
      *
      * @return array
      */
