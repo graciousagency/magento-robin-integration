@@ -32,7 +32,7 @@ class Robinhq_Hooks_Model_Robin_Customer
 
     /**
      * Makes the array the Robin API expects. If you want more
-     * info in the panel view, just add it in the $robinCustomer['panel_view'] array
+     * info in the panel view, just add it in the $robinCustomer['panal_view'] array
      *
      * @return array
      */
@@ -51,7 +51,6 @@ class Robinhq_Hooks_Model_Robin_Customer
             "customer_since" => Mage::getModel('core/date')->date('Y-m-d', strtotime($this->customer->getCreatedAt())),
             "order_count" => $orderCount,
             "total_spent" => $formattedTotalSpend,
-            //insert "panel_view" here for your additional data
             //optional data
             "name" => $this->customer->getName(),
             "currency" => Mage::app()->getStore()->getCurrentCurrencyCode(),

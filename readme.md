@@ -1,3 +1,6 @@
+*THIS README NEEDS MORE UPDATING*
+
+
 Magento Robin integration
 ==========================================================
 
@@ -14,32 +17,16 @@ __Make sure you have your ROBIN API key and API secret. If you don't have the AP
 
 ### Installation
 
-
 - Clone or download the git repo
 - If you downloaded the repo, unpack it
-- Log in to your Magento backend
-- Go to System -> Tools -> Backups and click on `System Backup`, this might take a while. Sit back, relax en let Magento do the heavy lifting.
-- Go to System -> Tools -> Compilation and disable compilation if it's enabled. 
-- Go to System -> Cache Management and enable Configuration
+- Copy over the files, preferably using rsync (rsync -rtlv --progress /location/of/package_files/ /location/of/magento/)
+- Log out of admin, flush cache, log back in
 
-From here you can make a choice, if you want to install the package though Magento Connect proceed, if not skip the next steps and follow the steps under __manual  installation__.
-
-- Go to System -> Magento Connect -> Magento Connect Manager and log in with your admin credentials
-- Under the field `Direct package file upload` click `Choose file` and browse to the location where you downloaded/cloned this repo and go to `package/0.0.1 alpha` and select the file `Robinhq_Hooks-0.0.1.tgz`
-- Click `Upload` to start the installation process
-- After the installation is completed go back to the admin page
-
-####Manual installation
-
-- Connect to your hosting through FTP and browse to your Magento root directory.
-- On your local machine, go to the location where you have downloaded the module.
-- Upload the folders `app` and `design` to the root directory of your Magento installation.
-- When your FTP client asks you to override or combine existing folders, choose __combine__! Otherwise your entire Magento installation will be overwritten!
 
 ### What's installed?
 
 The module gets installed inside the `app/code/community/Robinhq/Hooks` folder and the package settings file is located inside `app/etc/modules/Robin_Hooks.xml`. The admin design files are: `design/adminhtml/default/default/layout/Hooks.xml` and `design/adminhtml/default/default/template/hooks/hooksbackend.phtml`
-The module does not have it's own sql file or database, the api key and secret are saved through Magento's settings magic.
+The module does not have it's own sql file or database, the api key and secret are saved through Magento's config.
 
 ### What's next
 
@@ -55,17 +42,9 @@ You might have noticed the new `Robin` tab in your back-end menu bar. This is to
 By default the package will log what's happening and give the admin page notifications when something went good or bad. To see the log file, log in to your web server through ssh and navigate to your Magento root folder.
 
 To see the contents of the log file do the following
-```BASH
-cd /your/magento/root
-cd var/log/
-cat Robinhq_Hooks.log
-```
-To live watch what's happening when you place an order you can do this
-```BASH
-cd /your/magento/root
-cd var/log/
-tail -f Robinhq_hooks.log
-```
+```var/log/Robinhq_hooks.log```
+Use tail to keep an eye on it.
+
 Be sure you have logging enabled in the developer settings from Magento.
 
 ## Development
