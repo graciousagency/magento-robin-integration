@@ -23,7 +23,7 @@
             </hooks>
         </models>
         <resources>
-            <customerattribute1433318226_setup>
+            <hooks_setup>
                 <setup>
                     <module>Robinhq_Hooks</module>
                     <class>Mage_Customer_Model_Entity_Setup</class>
@@ -31,58 +31,46 @@
                 <connection>
                     <use>core_setup</use>
                 </connection>
-            </customerattribute1433318226_setup>
-            <customerattribute1433318226_write>
+            </hooks_setup>
+            <hooks_write>
                 <connection>
                     <use>core_write</use>
                 </connection>
-            </customerattribute1433318226_write>
-            <customerattribute1433318226_read>
+            </hooks_write>
+            <hooks_read>
                 <connection>
                     <use>core_read</use>
                 </connection>
-            </customerattribute1433318226_read>
+            </hooks_read>
         </resources>
         <events>
-            <customer_save_after> <!-- identifier of the event we want to catch -->
+            <customer_save_after>
                 <observers>
-                    <customer_save_after_handler> <!-- identifier of the event handler -->
+                    <customer_save_after_handler>
                         <type>singleton</type>
-                        <!-- class method call type; valid are model, object and singleton -->
                         <class>hooks/observer</class>
-                        <!-- observers class alias -->
                         <method>customerHook</method>
-                        <!-- observer's method to be called -->
                         <args></args>
-                        <!-- additional arguments passed to observer -->
                     </customer_save_after_handler>
                 </observers>
             </customer_save_after>
-            <sales_order_place_after> <!-- identifier of the event we want to catch -->
+            <sales_order_place_after>
                 <observers>
-                    <sales_order_place_after_handler> <!-- identifier of the event handler -->
+                    <sales_order_place_after_handler>
                         <type>singleton</type>
-                        <!-- class method call type; valid are model, object and singleton -->
                         <class>hooks/observer</class>
-                        <!-- observers class alias -->
                         <method>orderPlacedHook</method>
-                        <!-- observer's method to be called -->
                         <args></args>
-                        <!-- additional arguments passed to observer -->
                     </sales_order_place_after_handler>
                 </observers>
             </sales_order_place_after>
-            <sales_order_save_after> <!-- identifier of the event we want to catch -->
+            <sales_order_save_after>
                 <observers>
-                    <sales_order_save_after_handler> <!-- identifier of the event handler -->
+                    <sales_order_save_after_handler>
                         <type>model</type>
-                        <!-- class method call type; valid are model, object and singleton -->
                         <class>hooks/observer</class>
-                        <!-- observers class alias -->
                         <method>orderStatusChanceHook</method>
-                        <!-- observer's method to be called -->
                         <args></args>
-                        <!-- additional arguments passed to observer -->
                     </sales_order_save_after_handler>
                 </observers>
             </sales_order_save_after>
@@ -151,11 +139,6 @@
                 <bulk_limit>15</bulk_limit>
                 <select_limit>500</select_limit>
             </general>
-            <!--<optional>-->
-            <!--<send_optional_fields>-->
-            <!---->
-            <!--</send_optional_fields>-->
-            <!--</optional>-->
         </settings>
     </default>
 </config> 
