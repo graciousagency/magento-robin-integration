@@ -1,0 +1,5 @@
+# magento-robin-integration
+app/code/community/Robinhq/Hooks                   app/code/community/Robinhq/Hooks
+app/code/design/adminhtml/default/default/layout/*  app/code/design/adminhtml/default/default/layout/
+app/code/design/adminhtml/default/default/template/*  app/code/design/adminhtml/default/default/template/
+app/etc/modules/Robinhq_Hooks.xml          app/etc/modules/Robinhq_Hooks.xml
