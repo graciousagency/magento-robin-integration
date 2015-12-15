@@ -134,26 +134,27 @@ class Robinhq_Hooks_Model_Observer
         return $config['enabled'];
     }
 
-    /**
-     * Include our composer auto loader for the Carbon modules
-     *
-     * @param Varien_Event_Observer $event
-     */
-    public function controllerFrontInitBefore(Varien_Event_Observer $event) {
-        self::init();
-    }
-
-    /**
-     * Add in auto loader for Carbon components
-     */
-    static function init() {
-        // Add our vendor folder to our include path
-        set_include_path(get_include_path() . PATH_SEPARATOR . Mage::getBaseDir('lib') . DS . 'giggsey' . DS . 'libphonenumber-for-php');
-
-        // Include the autoloader for composer
-        require_once(Mage::getBaseDir('lib') . DS . 'giggsey' . DS . 'vendor' . DS . 'libphonenumber-for-php');
-    }
-
+//    /**
+//     * Include our composer auto loader for the Carbon modules
+//     *
+//     * @param Varien_Event_Observer $event
+//     */
+//    public function controllerFrontInitBefore(Varien_Event_Observer $event) {
+//        Mage::log(__METHOD__, null, 'pepijn.log');
+//        self::init();
+//    }
+//
+//    /**
+//     * Add in auto loader for Carbon components
+//     */
+//    static function init() {
+//        // Add our vendor folder to our include path
+//        set_include_path(get_include_path() . PATH_SEPARATOR . Mage::getBaseDir('lib') . DS . 'giggsey' . DS . 'libphonenumber-for-php');
+//
+//        // Include the autoloader for composer
+//        require_once(Mage::getBaseDir('lib') . DS . 'giggsey' . DS . 'vendor' . DS . 'libphonenumber-for-php');
+//    }
+//
 
 
 }
