@@ -152,8 +152,11 @@ class Robinhq_Hooks_Model_Observer
         // Add our vendor folder to our include path
         set_include_path(get_include_path() . PATH_SEPARATOR . Mage::getBaseDir('lib') . DS . 'giggsey' . DS . 'libphonenumber-for-php');
 
+
+
+
         // Include the autoloader for composer
-        require_once(Mage::getBaseDir('lib') . DS . 'giggsey' . DS . 'libphonenumber-for-php');
+        require_once(Mage::getBaseDir('lib') . DS . 'giggsey' . DS . 'libphonenumber-for-php' . DS . 'autoload.php');
     }
 
 

@@ -3,4 +3,3 @@ app/code/community/Robinhq/Hooks                        app/code/community/Robin
 app/design/adminhtml/default/default/layout/hooks.xml   app/code/design/adminhtml/default/default/layout/hooks.xml
 app/design/adminhtml/default/default/template/hooks     app/code/design/adminhtml/default/default/template/hooks
 app/etc/modules/Robinhq_Hooks.xml                       app/etc/modules/Robinhq_Hooks.xml
-vendor/giggsey                                          lib/giggsey
