@@ -44,15 +44,15 @@
             </hooks_read>
         </resources>
         <events>
-            <!--<controller_front_init_before>-->
-                <!--<observers>-->
-                    <!--<libphonenumber_load>-->
-                        <!--<type>singleton</type>-->
-                        <!--<class>hooks/observer</class>-->
-                        <!--<method>controllerFrontInitBefore</method>-->
-                    <!--</libphonenumber_load>-->
-                <!--</observers>-->
-            <!--</controller_front_init_before>-->
+            <controller_front_init_before>
+                <observers>
+                    <libphonenumber_load>
+                        <type>singleton</type>
+                        <class>hooks/observer</class>
+                        <method>controllerFrontInitBefore</method>
+                    </libphonenumber_load>
+                </observers>
+            </controller_front_init_before>
             <customer_save_after>
                 <observers>
                     <customer_save_after_handler>
