@@ -107,6 +107,56 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract {
         return $this->collector;
     }
 
+    public function formatPhoneNumber($phoneNumber, $countryCode) {
+        Mage::log(__METHOD__, null, 'pepijn.log');
+        $phoneNumberClean = preg_replace("/[^\d]/", "", $phoneNumber);
+        Mage::log('$countryCode = ' . $countryCode, null, 'pepijn.log');
+        Mage::log('$phoneNumber = ' . $phoneNumber, null, 'pepijn.log');
+        Mage::log('$phoneNumberClean = ' . $phoneNumberClean, null, 'pepijn.log');
+        $length = strlen($phoneNumber);
+        Mage::log('$length = ' . $length, null, 'pepijn.log');
+        if($length == 10) {
+            $phoneNumberFormatted = $phoneNumber;
+        }
+        if($length == 11) {
+            Mage::log('$VAR = ' . substr($phoneNumberClean,0,2), null, 'pepijn.log');
+            if($countryCode=='NL')  {
+                if(substr($phoneNumberClean, 0, 2)=='31') {
+                    $phoneNumberFormatted = substr_replace($phoneNumberClean,'0',0,2);
+                }
+            }else{
+                $phoneNumberFormatted = $phoneNumber;
+            }
+
+        }
+        Mage::log('$phoneNumberFormatted = ' . $phoneNumberFormatted, null, 'pepijn.log');
+        return $phoneNumberFormatted;
+    }
+
+    /**
+     * Gets the amount of rewardpoints a customer has saved up
+     *
+     * @return int
+     */
+    public function getRewardPoints() {
+        $points = 0;
+        $allStores = Mage::app()->getStores();
+        if ($this->customer->getId()) {
+            foreach ($allStores as $_eachStoreId => $val) {
+                $_storeId = Mage::app()->getStore($_eachStoreId)->getId();
+                if (Mage::getStoreConfig('rewardpoints/default/flatstats', $_storeId)) {
+                    $reward_flat_model = Mage::getModel('rewardpoints/flatstats');
+                    $points += $reward_flat_model->collectPointsCurrent($this->customer->getId(), $_storeId) + 0;
+                } else {
+                    $reward_model = Mage::getModel('rewardpoints/stats');
+                    $points += $reward_model->getPointsCurrent($this->customer->getId(), $_storeId) + 0;
+                }
+            }
+        }
+        return $points;
+    }
+
+
 
 }
 	 
