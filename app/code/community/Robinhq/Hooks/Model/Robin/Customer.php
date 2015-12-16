@@ -41,7 +41,7 @@ class Robinhq_Hooks_Model_Robin_Customer {
         $formattedTotalSpent = Mage::helper('core')->currency($lifetime->getLifetime(), true, false);
         $phoneNumber = $this->getCustomerPhoneNumber();
         $orderCount = $lifetime->getNumOrders();
-        $rewardPoints = Mage::helper('hooks')->getRewardPoints();
+        $rewardPoints = Mage::helper('hooks')->getRewardPoints($this->customer);
 
         $this->data = [
            'email_address'  => $this->customer->getEmail(),

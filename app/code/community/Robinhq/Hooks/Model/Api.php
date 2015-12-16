@@ -1,11 +1,11 @@
 <?php
 
+
 /**
  * A small wrapper to communicate with the Robin API.
  * Class Robinhq_Hooks_Model_Api
  */
-class Robinhq_Hooks_Model_Api
-{
+class Robinhq_Hooks_Model_Api {
 
     /**
      * @var Robinhq_Hooks_Model_Logger
@@ -16,19 +16,19 @@ class Robinhq_Hooks_Model_Api
      * Gets and sets the dependency's
      * @param Robinhq_Hooks_Model_Logger $logger
      */
-    public function __construct(Robinhq_Hooks_Model_Logger $logger)
-    {
+    public function __construct(Robinhq_Hooks_Model_Logger $logger) {
+
         $this->logger = $logger;
     }
 
-    public function customer($customer)
-    {
-        return $this->customers(array($customer));
+    public function customer($customer) {
+
+        return $this->customers([$customer]);
     }
 
-    public function order($order)
-    {
-        return $this->orders(array($order));
+    public function order($order) {
+
+        return $this->orders([$order]);
     }
 
     /**
@@ -38,9 +38,9 @@ class Robinhq_Hooks_Model_Api
      * @param $customers
      * @return mixed
      */
-    public function customers($customers)
-    {
-        $this->logger->log("Sending customers to ROBIN");
+    public function customers($customers) {
+
+        $this->logger->log('Sending customers to ROBIN');
         return $this->post('customers', $customers);
     }
 
@@ -51,10 +51,10 @@ class Robinhq_Hooks_Model_Api
      * @param $orders
      * @return mixed
      */
-    public function orders($orders)
-    {
-        $this->logger->log("Sending orders to ROBIN");
-        return $this->post("orders", $orders);
+    public function orders($orders) {
+
+        $this->logger->log('Sending orders to ROBIN');
+        return $this->post('orders', $orders);
     }
 
     /**
@@ -65,8 +65,8 @@ class Robinhq_Hooks_Model_Api
      * @throws Exception
      * @return resource
      */
-    private function setUpCurl($request)
-    {
+    private function setUpCurl($request) {
+
         $config = Mage::getStoreConfig('settings/general');
         if (!empty($config['api_key']) && !empty($config['api_secret'])) {
             $url = $config['api_url'] . '/' . $request;
@@ -75,12 +75,9 @@ class Robinhq_Hooks_Model_Api
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_USERPWD, $config['api_key'] . ":" . $config['api_secret']);
-
             return $ch;
         }
-        throw new Exception(
-            'Missing API configuration, go to System -> Configuration -> ROBINHQ -> Settings and fill in your API credentials'
-        );
+        throw new Exception('Missing API configuration, go to System -> Configuration -> ROBINHQ -> Settings and fill in your API credentials');
     }
 
     /**
@@ -96,23 +93,17 @@ class Robinhq_Hooks_Model_Api
      * @throws Robinhq_Hooks_Model_Exception_UnauthorizedException
      * @throws Robinhq_Hooks_Model_Exception_UnknownStatusCodeException
      */
-    private function post($request, $values)
-    {
+    private function post($request, $values) {
+
         $errorCodes = $this->getErrorCodes();
-
         $ch = $this->prepare($request, $values);
-
         $responseInfo = $this->execute($ch);
-
         $this->logger->log("Robin returned status: " . $responseInfo['http_code']);
-
         if (in_array($responseInfo['http_code'], $errorCodes)) {
             $error = Robinhq_Hooks_Model_Exception_RequestFailed::factory($responseInfo['http_code']);
             $this->logger->log($error->getMessage());
             throw $error;
         }
-
-
         return $responseInfo;
     }
 
@@ -121,15 +112,12 @@ class Robinhq_Hooks_Model_Api
      * @return mixed
      * @throws Robinhq_Hooks_Model_Exception_RequestImpossibleException
      */
-    private function execute($ch)
-    {
+    private function execute($ch) {
+
         if (curl_exec($ch) === false) {
             curl_close($ch);
-            throw new Robinhq_Hooks_Model_Exception_RequestImpossibleException(
-                "Error: 'Unable to preform request to Robin, request was not executed.'"
-            );
+            throw new Robinhq_Hooks_Model_Exception_RequestImpossibleException("Error: 'Unable to preform request to Robin, request was not executed.'");
         }
-
         $responseInfo = curl_getinfo($ch);
         curl_close($ch);
         return $responseInfo;
@@ -141,38 +129,34 @@ class Robinhq_Hooks_Model_Api
      * @return resource
      * @throws Exception
      */
-    private function prepare($request, $values)
-    {
-        $values = json_encode(array($request => $values));
+    private function prepare($request, $values) {
+
+        $values = json_encode([$request => $values]);
         $ch = $this->setUpCurl($request);
         $valuesLength = strlen($values);
         $this->logger->log("Posting with: " . $values);
-        curl_setopt(
-            $ch,
-            CURLOPT_HTTPHEADER,
-            array(
-                'Content-Type: application/json',
-                'Content-Length: ' . $valuesLength
-            )
-        );
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json',
+                'Content-Length: ' . $valuesLength,
+            ]);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $values);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_VERBOSE, true);
+        $fp = fopen(dirname(__FILE__) . '/robin_curl_output.txt', 'w');
+        curl_setopt($ch, CURLOPT_STDERR, $fp);
         return $ch;
     }
 
     /**
      * @return array
      */
-    private function getErrorCodes()
-    {
-        $codes = new Robinhq_Hooks_Model_Robin_StatusCode();
+    private function getErrorCodes() {
 
-        $errorCodes = array(
-            $codes::INTERNAL_SERVER_ERROR,
+        $codes = new Robinhq_Hooks_Model_Robin_StatusCode();
+        $errorCodes = [$codes::INTERNAL_SERVER_ERROR,
             $codes::BAD_REQUEST,
             $codes::UNAUTHORIZED,
-            $codes::RATE_LIMIT_EXCEEDED
-        );
+            $codes::RATE_LIMIT_EXCEEDED,
+        ];
         return $errorCodes;
     }
 

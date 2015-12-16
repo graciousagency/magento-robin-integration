@@ -60,7 +60,7 @@ class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Cont
             $massQueue = new Robinhq_Hooks_Model_Queue_Mass($this->helper);
             $massQueue->setName('ROBIN Mass Send');
             $massQueue->enqueue();
-            $this->helper->log('Done. Wait until the queue kicks in and handles this jobs');
+            $this->helper->log('Done. Wait until the queue kicks in and handles these jobs');
             $this->helper->noticeAdmin('The Mass Send process is pushed to the queue.');
         } else {
             $message = 'Module is disabled. Please enable it first.';

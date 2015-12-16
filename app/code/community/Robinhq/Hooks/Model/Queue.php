@@ -42,9 +42,14 @@ class Robinhq_Hooks_Model_Queue {
     }
 
     public function push($model) {
-
         $this->models[] = $model;
         $this->enqueueWhenBatchLimitIsReached();
+    }
+
+    public function pushImmediately($model)   {
+        $this->models[] = $model;
+        $this->enqueue();
+        $this->reset();
     }
 
     /**
