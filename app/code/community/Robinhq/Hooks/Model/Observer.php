@@ -4,8 +4,7 @@
 /**
  * Class Robinhq_Hooks_Model_Observer
  */
-class Robinhq_Hooks_Model_Observer
-{
+class Robinhq_Hooks_Model_Observer {
 
     /**
      * @var Robinhq_Hooks_Model_Queue
@@ -16,7 +15,6 @@ class Robinhq_Hooks_Model_Observer
      * @var Robinhq_Hooks_Model_Api
      */
     private $api;
-
 
     /**
      * @var Robinhq_Hooks_Helper_Data
@@ -33,8 +31,8 @@ class Robinhq_Hooks_Model_Observer
     /**
      * Gets and sets the dependency's
      */
-    public function __construct()
-    {
+    public function __construct() {
+
         $this->helper = Mage::helper("hooks");
         $this->push = $this->helper->getQueue();
         $this->api = $this->helper->getApi();
@@ -50,20 +48,20 @@ class Robinhq_Hooks_Model_Observer
      *
      * @param Varien_Event_Observer|Mage_Customer_Model_Customer $customer
      */
-    public function customerHook($customer)
-    {
+    public function customerHook($customer) {
+
         if ($this->enabled) {
             if ($customer instanceof Varien_Event_Observer) {
                 $customer = $customer->getEvent()->getCustomer();
             }
-
             if ($customer) {
                 try {
-                    $this->helper->log("User with id: " . $customer->getId() . " chanced, sending it to ROBIN");
+                    $this->helper->log('User with id: ' . $customer->getId() . ' changed, sending it to ROBIN');
                     $customer = $this->converter->toRobinCustomer($customer);
                     $this->api->customer($customer);
-                } catch (Exception $e) {
-                    $this->helper->log("Exception: " . $e->getMessage());
+                }
+                catch (Exception $e) {
+                    $this->helper->log('Exception: ' . $e->getMessage());
                     $this->helper->warnAdmin($e->getMessage());
                 }
             }
@@ -76,18 +74,19 @@ class Robinhq_Hooks_Model_Observer
      *
      * @param Varien_Event_Observer $observer
      */
-    public function orderPlacedHook(Varien_Event_Observer $observer)
-    {
+    public function orderPlacedHook(Varien_Event_Observer $observer) {
+
         if ($this->enabled) {
             /** @var Mage_Sales_Model_Order $order */
             $order = $observer->getEvent()->getOrder();
             if ($order) {
-                $this->helper->log("New order placed with id: " . $order->getId());
+                $this->helper->log('New order placed with id: ' . $order->getId());
                 try {
                     $order = $this->converter->toRobinOrder($order);
                     $this->api->order($order);
-                } catch (Exception $e) {
-                    $this->helper->log("Exception: " . $e->getMessage());
+                }
+                catch (Exception $e) {
+                    $this->helper->log('Exception: ' . $e->getMessage());
                     $this->helper->warnAdmin($e->getMessage());
                 }
             }
@@ -101,16 +100,16 @@ class Robinhq_Hooks_Model_Observer
      *
      * @param Varien_Event_Observer $observer
      */
-    public function orderStatusChanceHook(Varien_Event_Observer $observer)
-    {
+    public function orderStatusChangeHook(Varien_Event_Observer $observer) {
+
         if ($this->enabled) {
             $order = $observer->getEvent()->getOrder();
             $status = $order->getStatus();
             if (is_string($status)) { //only fire when we actually have an status
-                $string = "The status of order #" . $order->getIncrementId() . " chanced to: " . $order->getStatus();
+                $string = 'The status of order #' . $order->getIncrementId() . ' changed to: ' . $order->getStatus();
                 $this->helper->log($string);
                 try {
-                    $this->helper->log("Order has changed, sending it to Robin");
+                    $this->helper->log('Order has changed, sending it to Robin');
                     $robinOrder = $this->converter->toRobinOrder($order);
                     $this->api->order($robinOrder);
                     if ($order->getCustomerId() !== null) {
@@ -118,18 +117,18 @@ class Robinhq_Hooks_Model_Observer
                         $customer = Mage::getModel('customer/customer')->load($order->getCustomerId());
                         $this->customerHook($customer);
                     }
-
                     // TODO: Implement Guests checkout
-                } catch (Exception $e) {
-                    $this->helper->log("Exception: " . $e->getMessage());
+                }
+                catch (Exception $e) {
+                    $this->helper->log('Exception: ' . $e->getMessage());
                     $this->helper->warnAdmin($e->getMessage());
                 }
             }
         }
     }
 
-    private function isEnabled()
-    {
+    private function isEnabled() {
+
         $config = Mage::getStoreConfig('settings/general');
         return $config['enabled'];
     }
@@ -140,25 +139,18 @@ class Robinhq_Hooks_Model_Observer
      * @param Varien_Event_Observer $event
      */
     public function controllerFrontInitBefore(Varien_Event_Observer $event) {
-        Mage::log(__METHOD__, null, 'pepijn.log');
-        self::init();
+
+        //        Mage::log(__METHOD__, null, 'pepijn.log');
+        //        Mage::log('----------------------------', null, 'pepijn.log');
+        //        Mage::helper('hooks')->formatPhoneNumber('0624289059', 'NL');
+        //        Mage::log('----------------------------', null, 'pepijn.log');
+        //        Mage::helper('hooks')->formatPhoneNumber('31624289059', 'NL');
+        //        Mage::log('----------------------------', null, 'pepijn.log');
+        //        Mage::helper('hooks')->formatPhoneNumber('32624289059', 'BE');
+        //        Mage::log('----------------------------', null, 'pepijn.log');
+        //        $address = Mage::getModel('customer/address')->load(1000);
+        //        Mage::log('$address = ' . $address->getCountryId(), null, 'pepijn.log');
     }
-
-    /**
-     * Add in auto loader
-     */
-    static function init() {
-        Mage::log(__METHOD__, null, 'pepijn.log');
-        // Add our vendor folder to our include path
-        set_include_path(get_include_path() . PATH_SEPARATOR . Mage::getBaseDir('lib') . DS . 'giggsey' . DS . 'libphonenumber-for-php');
-
-
-
-
-        // Include the autoloader for composer
-        require_once(Mage::getBaseDir('lib') . DS . 'giggsey' . DS . 'libphonenumber-for-php' . DS . 'autoload.php');
-    }
-
 
 
 }

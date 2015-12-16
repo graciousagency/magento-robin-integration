@@ -78,7 +78,7 @@
                     <sales_order_save_after_handler>
                         <type>model</type>
                         <class>hooks/observer</class>
-                        <method>orderStatusChanceHook</method>
+                        <method>orderStatusChangeHook</method>
                         <args></args>
                     </sales_order_save_after_handler>
                 </observers>
