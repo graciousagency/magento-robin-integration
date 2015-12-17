@@ -140,9 +140,9 @@ class Robinhq_Hooks_Model_Api {
             ]);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $values);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_VERBOSE, true);
-        $fp = fopen(dirname(__FILE__) . '/robin_curl_output.txt', 'w');
-        curl_setopt($ch, CURLOPT_STDERR, $fp);
+//        curl_setopt($ch, CURLOPT_VERBOSE, true);
+//        $fp = fopen(dirname(__FILE__) . '/robin_curl_output.txt', 'w');
+//        curl_setopt($ch, CURLOPT_STDERR, $fp);
         return $ch;
     }
 
