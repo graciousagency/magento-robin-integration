@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
 <layout version="0.1.0">
-  <hooks_adminhtml_hooksbackend_index>
-	<reference name="content">
-	  <block type="hooks/adminhtml_hooksbackend" name="hooksbackend" template="hooks/hooksbackend.phtml"/>
-	</reference>
-
-  </hooks_adminhtml_hooksbackend_index>
+    <hooks_adminhtml_hooksbackend_index>
+        <reference name="content">
+            <block type="hooks/adminhtml_hooksbackend" name="hooksbackend" template="hooks/hooksbackend.phtml"/>
+        </reference>
+    </hooks_adminhtml_hooksbackend_index>
 </layout>

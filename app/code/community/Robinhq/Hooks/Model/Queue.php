@@ -48,7 +48,7 @@ class Robinhq_Hooks_Model_Queue {
 
     public function pushImmediately($model)   {
         $this->models[] = $model;
-        $this->enqueue();
+        $this->enqueueDeduplicate();
         $this->reset();
     }
 
@@ -80,6 +80,36 @@ class Robinhq_Hooks_Model_Queue {
         if ($this->type === static::CUSTOMER) {
             $queueAble = new Robinhq_Hooks_Model_Queue_Customers($this->api, $this->models);
             $message = "Customers batch #" . $this->batch++ . " containing " . count($this->models) . " customers (" . $first['email_address'] . " - " . $last['email_address'] . ")";
+        }
+        if ($queueAble !== null) {
+            $queueAble->setName($message);
+            $queueAble->enqueue();
+        }
+        $this->logger->log($message . " added to the queue");
+    }
+
+    private function enqueueDeduplicate() {
+
+        $queueAble = null;
+        $message = 'Nothing';
+        $model = $this->models[0];
+        if ($this->type === static::ORDER) {
+            $message = "Order " . $model['order_number'];
+            $jobs = Mage::getModel('jobqueue/job')
+                ->getCollection()
+                ->addFieldToFilter('name', $message)
+            ;
+            $jobs->walk('delete');
+            $queueAble = new Robinhq_Hooks_Model_Queue_Orders($this->api, $this->models);
+        }
+        if ($this->type === static::CUSTOMER) {
+            $message = "Customer " . $model['email_address'];
+            $jobs = Mage::getModel('jobqueue/job')
+                ->getCollection()
+                ->addFieldToFilter('name', $message)
+            ;
+            $jobs->walk('delete');
+            $queueAble = new Robinhq_Hooks_Model_Queue_Customers($this->api, $this->models);
         }
         if ($queueAble !== null) {
             $queueAble->setName($message);
