@@ -33,7 +33,7 @@ class Robinhq_Hooks_Model_Queue_Mass extends Jowens_JobQueue_Model_Job_Abstract 
         try {
             $this->collector->customers();
             $this->collector->orders();
-            $this->logger->log('Robin Mass Sender finished building the queue. Wait unitll the queue kicks in and handles the jobs');
+            $this->logger->log('Robin Mass Sender finished building the queue. Wait until the queue kicks in and handles the jobs');
             $this->helper->noticeAdmin('All customers and orders are send to the queue. Depending on your cron settings, they will soon be sent to ROBIN');
         }
         catch (Exception $e) {
