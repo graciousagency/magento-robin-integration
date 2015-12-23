@@ -36,16 +36,31 @@ class Robinhq_Hooks_Model_Queue {
         $this->logger = $logger;
     }
 
+    /**
+     * @param $type
+     */
     public function setType($type) {
 
         $this->type = $type;
     }
 
+    /**
+     * This pushes a model to the queue when the batch limit has not been reached yet
+     * Otherwise it starts creating another batch
+     *
+     * @param $model
+     */
     public function push($model) {
         $this->models[] = $model;
         $this->enqueueWhenBatchLimitIsReached();
     }
 
+    /**
+     * Ignore batch settings and add to queue right away
+     * Creates single lines in the queue instead of a batch
+     *
+     * @param $model
+     */
     public function pushImmediately($model)   {
         $this->models[] = $model;
         $this->enqueueDeduplicate();
@@ -66,6 +81,9 @@ class Robinhq_Hooks_Model_Queue {
         $this->reset();
     }
 
+    /**
+     * This creates a queue as used by the mass uploader
+     */
     private function enqueue() {
 
         $queueAble = null;
@@ -88,6 +106,10 @@ class Robinhq_Hooks_Model_Queue {
         $this->logger->log($message . " added to the queue");
     }
 
+    /**
+     * This enqueues the model and removes any old ones with the same message name
+     * This is generally used by the observer since Magento has a knack of firing off multiple events during a single submit
+     */
     private function enqueueDeduplicate() {
 
         $queueAble = null;
@@ -119,6 +141,8 @@ class Robinhq_Hooks_Model_Queue {
     }
 
     /**
+     * Enqueue when the batch limit has been reached
+     *
      * @return bool
      */
     private function enqueueWhenBatchLimitIsReached() {
@@ -129,8 +153,10 @@ class Robinhq_Hooks_Model_Queue {
         }
     }
 
+    /**
+     * Empty $this->models
+     */
     private function reset() {
-
         $this->models = [];
     }
 }
