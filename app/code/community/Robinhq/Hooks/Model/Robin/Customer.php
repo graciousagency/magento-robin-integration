@@ -44,7 +44,7 @@ class Robinhq_Hooks_Model_Robin_Customer {
         $rewardPoints = Mage::helper('hooks')->getRewardPoints($this->customer);
 
         $this->data = [
-           'email_address'  => $this->customer->getEmail(),
+           'email_address'  => trim($this->customer->getEmail()),
            'customer_since' => Mage::getModel('core/date')->date('Y-m-d', strtotime($this->customer->getCreatedAt())),
            'order_count'    => $orderCount,
            'total_spent'    => $formattedTotalSpent,
