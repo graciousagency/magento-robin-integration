@@ -61,7 +61,6 @@ class Robinhq_Hooks_Model_Collector {
      */
     private function customerCallback($customerData) {
 
-
         /** @var Mage_Customer_Model_Customer $customer */
         $customer = Mage::getModel('customer/customer');
         $customer->setData($customerData);
@@ -77,7 +76,9 @@ class Robinhq_Hooks_Model_Collector {
     private function orderCallback($orderData) {
 
         /** @var Mage_Sales_Model_Order $order */
-        $order = Mage::getModel('sales/order')->load($orderData['entity_id'], 'entity_id');
+        $order = Mage::getModel('sales/order')
+                     ->load($orderData['entity_id'], 'entity_id')
+        ;
         $order = $this->converter->toRobinOrder($order);
         $this->queue->push($order);
     }
@@ -87,7 +88,11 @@ class Robinhq_Hooks_Model_Collector {
      */
     private function getOrdersPaginated($size) {
 
-        return Mage::getModel('sales/order')->getCollection()->addAttributeToSelect('entity_id')->setPageSize($size);
+        return Mage::getModel('sales/order')
+                   ->getCollection()
+                   ->addAttributeToSelect('entity_id')
+                   ->setPageSize($size)
+            ;
     }
 
     /**
@@ -95,9 +100,14 @@ class Robinhq_Hooks_Model_Collector {
      */
     private function getCustomersPaginated($size) {
 
-        return Mage::getModel('customer/customer')->getCollection()->addNameToSelect()->addAttributeToSelect('email')
-            ->joinAttribute('billing_telephone', 'customer_address/telephone', 'default_billing', null, 'left')
-            ->addAttributeToSelect('created_at')->addAttributeToSelect('twitter_handler')->setPageSize($size)
+        return Mage::getModel('customer/customer')
+                   ->getCollection()
+                   ->addNameToSelect()
+                   ->addAttributeToSelect('email')
+                   ->joinAttribute('billing_telephone', 'customer_address/telephone', 'default_billing', null, 'left')
+                   ->addAttributeToSelect('created_at')
+                   ->addAttributeToSelect('twitter_handler')
+                   ->setPageSize($size)
             ;
     }
 
@@ -111,7 +121,10 @@ class Robinhq_Hooks_Model_Collector {
         for ($i = 1; $i <= $size; $i++) {
             $collection->setCurPage($i);
             $collection->load();
-            $this->iterate($collection, [$this, $callback]);
+            $this->iterate($collection, [
+                $this,
+                $callback,
+            ]);
             $collection->clear();
         }
         $this->queue->clear();
