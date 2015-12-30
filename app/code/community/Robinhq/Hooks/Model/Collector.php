@@ -79,8 +79,11 @@ class Robinhq_Hooks_Model_Collector {
         $order = Mage::getModel('sales/order')
                      ->load($orderData['entity_id'], 'entity_id')
         ;
-        $order = $this->converter->toRobinOrder($order);
-        $this->queue->push($order);
+        if (!empty($order->customer_email)) {
+            $order = $this->converter->toRobinOrder($order);
+            $this->queue->push($order);
+        }
+        $order = null;
     }
 
     /**
@@ -91,6 +94,9 @@ class Robinhq_Hooks_Model_Collector {
         return Mage::getModel('sales/order')
                    ->getCollection()
                    ->addAttributeToSelect('entity_id')
+                   ->addAttributeToSelect('customer_email')
+                   ->setOrder('increment_id', 'DESC')
+                   ->addFieldToFilter('customer_email', ['null' => false])
                    ->setPageSize($size)
             ;
     }
@@ -106,7 +112,7 @@ class Robinhq_Hooks_Model_Collector {
                    ->addAttributeToSelect('email')
                    ->joinAttribute('billing_telephone', 'customer_address/telephone', 'default_billing', null, 'left')
                    ->addAttributeToSelect('created_at')
-                   ->addAttributeToSelect('twitter_handler')
+                   ->addFieldToFilter('email', ['null' => false])
                    ->setPageSize($size)
             ;
     }

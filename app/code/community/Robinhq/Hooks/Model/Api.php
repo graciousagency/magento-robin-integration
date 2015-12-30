@@ -131,7 +131,20 @@ class Robinhq_Hooks_Model_Api {
      */
     private function prepare($request, $values) {
 
-        $values = json_encode([$request => $values]);
+        // Start extra check to make sure we are not passing any customers or orders without email
+        $aKeysToRemove = [];
+        foreach($values as $key=>$value)    {
+            if(empty($value['email_address']))  {
+                $aKeysToRemove[] = $key;
+            }
+        }
+        foreach($values as $key=>$value)    {
+            if(!in_array($key, $aKeysToRemove)) {
+                $valuesNew[] = $value;
+            }
+        }
+        // End extra email check
+        $values = json_encode([$request => $valuesNew]);
         $ch = $this->setUpCurl($request);
         $valuesLength = strlen($values);
         $this->logger->log("Posting with: " . $values);

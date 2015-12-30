@@ -246,13 +246,11 @@ This method goes through all customers given to it and maps them to a RobinCusto
       },
       "name": "John Doe",
       "currency":"EUR",
-      "phone_number":"0612345678",
-      "twitter_name":"johnDoe"
+      "phone_number":"0612345678"
 }
 ```
 
-The ROBIN API documentation also talks about optional data. This package sends those fields by default. To be 
-able to send the twitter name of a client, the new "twitter name" label for the customer is created on installation.
+The ROBIN API documentation also talks about optional data. This package sends those fields by default.
  
 The `panel_view` contains a new object of key/value pairs that can be anything. As an example I've added the total orders and the total spent. How to use the panel_view array is explained in the [Robin API][robin-api] documentation.
 
