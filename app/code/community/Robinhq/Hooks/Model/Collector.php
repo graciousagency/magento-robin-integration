@@ -34,7 +34,7 @@ class Robinhq_Hooks_Model_Collector {
 
         $this->queue->setType(Robinhq_Hooks_Model_Queue::ORDER);
         $collection = $this->getOrdersPaginated($this->pagination);
-        $this->walk($collection, "orderCallback");
+        $this->walk($collection, 'orderCallback');
     }
 
     public function customers() {
@@ -92,13 +92,13 @@ class Robinhq_Hooks_Model_Collector {
     private function getOrdersPaginated($size) {
 
         return Mage::getModel('sales/order')
-                   ->getCollection()
-                   ->addAttributeToSelect('entity_id')
-                   ->addAttributeToSelect('customer_email')
-                   ->setOrder('increment_id', 'DESC')
-                   ->addFieldToFilter('customer_email', ['null' => false])
-                   ->setPageSize($size)
-            ;
+                           ->getCollection()
+                           ->addAttributeToSelect('entity_id')
+                           ->addAttributeToSelect('customer_email')
+                           ->setOrder('increment_id', 'DESC')
+                           ->addFieldToFilter('customer_email', ['notnull' => true])
+                           ->setPageSize($size)
+        ;
     }
 
     /**
@@ -107,14 +107,14 @@ class Robinhq_Hooks_Model_Collector {
     private function getCustomersPaginated($size) {
 
         return Mage::getModel('customer/customer')
-                   ->getCollection()
-                   ->addNameToSelect()
-                   ->addAttributeToSelect('email')
-                   ->joinAttribute('billing_telephone', 'customer_address/telephone', 'default_billing', null, 'left')
-                   ->addAttributeToSelect('created_at')
-                   ->addFieldToFilter('email', ['null' => false])
-                   ->setPageSize($size)
-            ;
+                           ->getCollection()
+                           ->addNameToSelect()
+                           ->addAttributeToSelect('email')
+                           ->joinAttribute('billing_telephone', 'customer_address/telephone', 'default_billing', null, 'left')
+                           ->addAttributeToSelect('created_at')
+                           ->addFieldToFilter('email', ['notnull' => true])
+                           ->setPageSize($size)
+        ;
     }
 
     /**

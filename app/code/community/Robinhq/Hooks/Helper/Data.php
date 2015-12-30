@@ -136,16 +136,24 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract {
      */
     public function getRewardPoints($_customer) {
         $points = 0;
-        $allStores = Mage::app()->getStores();
-        if ($_customer->getId()) {
-            foreach ($allStores as $_eachStoreId => $val) {
-                $_storeId = Mage::app()->getStore($_eachStoreId)->getId();
-                if (Mage::getStoreConfig('rewardpoints/default/flatstats', $_storeId)) {
-                    $reward_flat_model = Mage::getModel('rewardpoints/flatstats');
-                    $points += $reward_flat_model->collectPointsCurrent($_customer->getId(), $_storeId) + 0;
-                } else {
-                    $reward_model = Mage::getModel('rewardpoints/stats');
-                    $points += $reward_model->getPointsCurrent($_customer->getId(), $_storeId) + 0;
+
+        if(Mage::getConfig()->getModuleConfig('Rewardpoints')->is('active', 'true'))  {
+            $allStores = Mage::app()->getStores();
+            if ($_customer->getId()) {
+                foreach ($allStores as $_eachStoreId => $val) {
+                    $_storeId = Mage::app()->getStore($_eachStoreId)->getId();
+                    if (Mage::getStoreConfig('rewardpoints/default/flatstats', $_storeId)) {
+                        $reward_flat_model = Mage::getModel('rewardpoints/flatstats');
+                        if($reward_flat_model)  {
+                            $points += $reward_flat_model->collectPointsCurrent($_customer->getId(), $_storeId) + 0;
+                        }
+                    } else {
+                        $reward_model = Mage::getModel('rewardpoints/stats');
+                        if($reward_model)   {
+                            $points += $reward_model->getPointsCurrent($_customer->getId(), $_storeId) + 0;
+                        }
+
+                    }
                 }
             }
         }
