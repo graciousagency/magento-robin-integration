@@ -40,11 +40,11 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract {
         $config = Mage::getStoreConfig('settings/general');
         $this->bulkLimit = (int)$config['bulk_limit'];
         $this->selectLimit = (int)$config['select_limit'];
-        $this->logger = Mage::getModel('hooks/logger');
-        $this->api = Mage::getModel('hooks/api', array($this->logger));
-        $this->queue = Mage::getModel('hooks/queue', array($this->logger, $this->api, $this->bulkLimit));
-        $this->converter = Mage::getModel('hooks/robin_converter');
-        $this->collector = Mage::getModel('hooks/collector', array($this->queue, $this->converter, $this->selectLimit));
+        $this->logger = new Robinhq_Hooks_Model_Logger();
+        $this->api = new Robinhq_Hooks_Model_Api($this->logger);
+        $this->queue = new Robinhq_Hooks_Model_Queue($this->logger, $this->api, $this->bulkLimit);
+        $this->converter = new Robinhq_Hooks_Model_Robin_Converter();
+        $this->collector = new Robinhq_Hooks_Model_Collector($this->queue, $this->converter, $this->selectLimit);
     }
 
     /**
@@ -159,5 +159,8 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract {
         }
         return $points;
     }
+
+
+
 }
 	 
