@@ -133,7 +133,7 @@ class Robinhq_Hooks_Model_Robin_Order {
             "caption"    => 'products',
             "data"       => [],
         ];
-        $base['data'] = $this->getProducts($base);
+        $base['data'] = $this->getProducts();
         $base['data'][] = $this->getShipmentInfo();
         $base['data'][] = $this->getOrderTotalInfo();
         return $base;
@@ -240,7 +240,7 @@ class Robinhq_Hooks_Model_Robin_Order {
      */
     private function getOrderAdminUrl() {
 
-        return Mage::helper('adminhtml')
+        return Mage::helper('hooks')
                    ->getUrl('adminhtml/sales_order/view', [
                            'order_id' => $this->order->getId(),
                            '_type'    => Mage_Core_Model_Store::URL_TYPE_WEB,
@@ -258,7 +258,7 @@ class Robinhq_Hooks_Model_Robin_Order {
                           ->loadByIncrementId($shipment->getIncrementId())
                           ->getId()
         ;
-        return Mage::helper('adminhtml')
+        return Mage::helper('hooks')
                    ->getUrl('adminhtml/sales_shipment/view', [
                            'shipment_id' => $shipmentId,
                            '_type'       => Mage_Core_Model_Store::URL_TYPE_WEB,
@@ -294,7 +294,7 @@ class Robinhq_Hooks_Model_Robin_Order {
      */
     private function getInvoiceAdminUrl($invoice) {
 
-        return Mage::helper('adminhtml')
+        return Mage::helper('hooks')
                    ->getUrl('adminhtml/sales_invoice/view', [
                            'invoice_id' => $invoice->getId(),
                            '_type'      => Mage_Core_Model_Store::URL_TYPE_WEB,

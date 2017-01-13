@@ -242,7 +242,7 @@ This method goes through all customers given to it and maps them to a RobinCusto
       "panel_view":  
       {
          "Orders":  "12",
-         "Total_spent":  "$154.95",
+         "Total_spent":  "$154.95"
       },
       "name": "John Doe",
       "currency":"EUR",

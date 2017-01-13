@@ -151,6 +151,7 @@ class Robinhq_Hooks_Model_Queue {
             $this->enqueue();
             $this->reset();
         }
+        return;
     }
 
     /**

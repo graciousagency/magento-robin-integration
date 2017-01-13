@@ -160,6 +160,15 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract {
         return $points;
     }
 
+    /**
+     * @param string $route
+     * @param array  $params
+     *
+     * @return string
+     */
+    public function getUrl($route='', $params=array())    {
+        return Mage::getModel('adminhtml/url')->setStore(Mage_Core_Model_App::ADMIN_STORE_ID)->getUrl($route, $params);
+    }
 
 
 }
