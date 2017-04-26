@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <config>
     <menu>
-        <robinhq module="hooks">
+        <robinhq module="robinhq_hooks">
             <title>Robin</title>
             <sort_order>90</sort_order>
             <children>
-                <hooksbackend module="hooks">
+                <hooksbackend module="robinhq_hooks">
                     <title>Mass Send</title>
                     <sort_order>0</sort_order>
-                    <action>hooks/adminhtml_hooksbackend</action>
+                    <action>adminhtml/hooksbackend</action>
                 </hooksbackend>
             </children>
         </robinhq>
@@ -20,20 +20,15 @@
             </all>
             <admin>
                 <children>
-                    <hooks translate="title" module="hooks">
-                        <title>Hooks</title>
+                    <hooksbackend translate="title" module="robinhq_hooks">
+                        <title>Hooks Robin</title>
                         <sort_order>1000</sort_order>
-                        <children>
-                            <hooksbackend translate="title">
-                                <title>Robin</title>
-                            </hooksbackend>
-                        </children>
-                    </hooks>
+                    </hooksbackend>
                     <system>
                         <children>
                             <config>
                                 <children>
-                                    <settings translate="title" module="hooks">
+                                    <settings translate="title" module="robinhq_hooks">
                                         <title>Settings Section</title>
                                         <sort_order>10</sort_order>
                                     </settings>

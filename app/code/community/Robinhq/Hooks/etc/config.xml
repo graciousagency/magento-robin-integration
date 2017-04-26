@@ -69,7 +69,7 @@
             <adminhtml>
                 <args>
                     <modules>
-                        <robinhq_hooks after="Mage_Adminhtml">Robinhq_Hooks_Adminhtml</robinhq_hooks>
+                        <robinhq_hooks before="Mage_Adminhtml">Robinhq_Hooks_Adminhtml</robinhq_hooks>
                     </modules>
                 </args>
             </adminhtml>
