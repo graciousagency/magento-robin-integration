@@ -28,14 +28,11 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function __construct()
     {
-        $bulkLimit = abs(+$this->getConfig('bulk_limit'));
-        $selectLimit = abs(+$this->getConfig('select_limit'));
-
         $this->logger = $logger = Mage::getModel('robinhq_hooks/logger');
-        $this->api = $api = Mage::getModel('robinhq_hooks/api', [$this]);
-        $this->queue = $queue = Mage::getModel('robinhq_hooks/queue', [$logger, $api, $bulkLimit]);
-        $this->converter = $converter = Mage::getModel('robinhq_hooks/robin_converter');
-        $this->collector = Mage::getModel('robinhq_hooks/collector', [$queue, $converter, $selectLimit]);
+        $this->api = Mage::getModel('robinhq_hooks/api', [$this]);
+        $this->queue = Mage::getModel('robinhq_hooks/queue', [$this]);
+        $this->converter = Mage::getModel('robinhq_hooks/robin_converter');
+        $this->collector = Mage::getModel('robinhq_hooks/collector', [$this]);
     }
 
     /**
