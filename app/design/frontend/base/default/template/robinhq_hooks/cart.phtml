@@ -1,0 +1,11 @@
+<div class="nosto_cart" style="display: none">
+    <?php foreach ($this->getItems() as $_item) { ?>
+        <div class="line_item">
+            <span class="product_id"><?php echo $_item->getSku(); ?></span>
+            <span class="quantity"><?php echo $_item->getQty(); ?></span>
+            <span class="name"><?php echo $_item->getName(); ?></span>
+            <span class="unit_price"><?php echo Mage::helper('checkout')->getPriceInclTax($_item); ?></span>
+            <span class="price_currency_code"><?php echo Mage::app()->getStore()->getCurrentCurrencyCode(); ?></span>
+        </div>
+    <?php } ?>
+</div>

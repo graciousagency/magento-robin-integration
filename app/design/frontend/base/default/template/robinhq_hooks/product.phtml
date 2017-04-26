@@ -1,0 +1,10 @@
+<?php $_product = $this->getProduct(); ?>
+<div class="nosto_product" style="display: none">
+    <span class="url"><?php echo $_product->geturl() ?></span>
+    <span class="product_id"><?php echo $_product->getSku(); ?></span>
+    <span class="name"><?php echo $_product->getName() ?></span>
+    <span class="image_url"><?php echo $this->getImageUrl(); ?></span>
+    <span class="price"><?php echo $_product->getPrice() ?></span>
+    <span class="price_currency_code"><?php echo Mage::app()->getStore()->getCurrentCurrencyCode(); ?></span>
+    <span class="availability"><?php echo $this->getStockStatus() ?></span>
+</div>
