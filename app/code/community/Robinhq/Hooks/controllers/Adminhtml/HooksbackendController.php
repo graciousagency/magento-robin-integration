@@ -4,19 +4,23 @@
 /**
  * Class Robinhq_Hooks_Adminhtml_HooksbackendController
  */
-class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Controller_Action {
+class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Controller_Action
+{
 
-    /**
-     * @var Robinhq_Hooks_Helper_Data
-     */
-    private $helper;
+    /** @var Robinhq_Hooks_Helper_Data */
+    protected $_helper;
+
+    protected function _construct()
+    {
+        parent::_construct();
+        $this->_helper = Mage::helper('hooks');
+    }
 
     /**
      * Sets up $this->helper
      */
     private function isEnabled() {
 
-        $this->helper = Mage::helper('hooks');
         $config = Mage::getStoreConfig('settings/general');
         return $config['enabled'];
     }
@@ -56,16 +60,16 @@ class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Cont
     public function runAction() {
 
         if ($this->isEnabled()) {
-            $this->helper->log('Putting the Mass Sender action on the queue');
-            $massQueue = new Robinhq_Hooks_Model_Queue_Mass($this->helper);
+            $this->_helper->log('Putting the Mass Sender action on the queue');
+            $massQueue = new Robinhq_Hooks_Model_Queue_Mass($this->_helper);
             $massQueue->setName('ROBIN Mass Send');
             $massQueue->enqueue();
-            $this->helper->log('Done. Wait until the queue kicks in and handles these jobs');
-            $this->helper->noticeAdmin('The Mass Send process is pushed to the queue.');
+            $this->_helper->log('Done. Wait until the queue kicks in and handles these jobs');
+            $this->_helper->noticeAdmin('The Mass Send process is pushed to the queue.');
         } else {
             $message = 'Module is disabled. Please enable it first.';
-            $this->helper->warnAdmin($message);
-            $this->helper->log($message);
+            $this->_helper->warnAdmin($message);
+            $this->_helper->log($message);
         }
         $this->_redirect('*/adminhtml_hooksbackend/index');
     }
