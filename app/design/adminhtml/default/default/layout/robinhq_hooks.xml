@@ -2,7 +2,7 @@
 <layout version="0.1.0">
     <hooks_adminhtml_hooksbackend_index>
         <reference name="content">
-            <block type="hooks/adminhtml_hooksbackend" name="hooksbackend" template="hooks/hooksbackend.phtml"/>
+            <block type="robinhq_hooks/adminhtml_hooksbackend" name="hooksbackend" template="robinhq_hooks/backend.phtml"/>
         </reference>
     </hooks_adminhtml_hooksbackend_index>
 </layout>
