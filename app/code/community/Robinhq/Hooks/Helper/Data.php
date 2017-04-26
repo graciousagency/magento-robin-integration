@@ -4,169 +4,209 @@
 /**
  * Class Robinhq_Hooks_Helper_Data
  */
-class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract {
+class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract
+{
 
-    /**
-     * @var Robinhq_Hooks_Model_Queue
-     */
-    private $queue;
+    /** Config base */
+    CONST CONFIG_BASE = 'settings/general/';
 
-    /**
-     * @var Robinhq_Hooks_Model_Logger
-     */
-    private $logger;
+    /** @var Robinhq_Hooks_Model_Queue */
+    protected $queue;
+    /** @var Robinhq_Hooks_Model_Robin_Converter */
+    protected $converter;
+    /** @var Robinhq_Hooks_Model_Collector */
+    protected $collector;
 
-    /**
-     * @var Robinhq_Hooks_Model_Robin_Converter
-     */
-    private $converter;
+    /** @var Robinhq_Hooks_Model_Api */
+    protected $api;
 
-    private $bulkLimit;
+    /** @var Robinhq_Hooks_Model_Logger */
+    protected $logger;
 
-    private $selectLimit;
-
-    private $api;
-
-    /**
-     * @var Robinhq_Hooks_Model_Collector
-     */
-    private $collector;
+    /** @var int */
+    protected $bulkLimit;
+    /** @var int */
+    protected $selectLimit;
 
     /**
      * Gets and sets the dependency's
      */
-    public function __construct() {
+    public function __construct()
+    {
 
-        $config = Mage::getStoreConfig('settings/general');
-        $this->bulkLimit = (int)$config['bulk_limit'];
-        $this->selectLimit = (int)$config['select_limit'];
-        $this->logger = new Robinhq_Hooks_Model_Logger();
-        $this->api = new Robinhq_Hooks_Model_Api($this->logger);
-        $this->queue = new Robinhq_Hooks_Model_Queue($this->logger, $this->api, $this->bulkLimit);
-        $this->converter = new Robinhq_Hooks_Model_Robin_Converter();
-        $this->collector = new Robinhq_Hooks_Model_Collector($this->queue, $this->converter, $this->selectLimit);
+        $this->bulkLimit = $bulkLimit = abs(+$this->getConfig('bulk_limit'));
+        $this->selectLimit = $selectLimit = abs(+$this->getConfig('select_limit'));
+
+        $this->logger = $logger = Mage::getModel('robinhq_hooks/logger');
+        $this->api = $api = Mage::getModel('robinhq_hooks/api', [$logger]);
+        $this->queue = $queue = Mage::getModel('robinhq_hooks/queue', [$logger, $api, $bulkLimit]);
+        $this->converter = $converter = Mage::getModel('robinhq_hooks/robin_converter');
+        $this->collector = Mage::getModel('robinhq_hooks/collector', [$queue, $converter, $selectLimit]);
     }
 
     /**
-     * @param $message
+     * Get config base
+     *
+     * @param string $name
+     * @return mixed
      */
-    public function log($message) {
-
-        $this->logger->log($message);
+    public function getConfig($name)
+    {
+        return Mage::getStoreConfig(self::CONFIG_BASE . $name);
     }
 
     /**
+     * Get config flag
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function getConfigFlag($name)
+    {
+        return !!$this->getConfig($name);
+    }
+
+    /**
+     * Log message
+     *
+     * @param sting $message
+     */
+    public function log($message)
+    {
+        $this->getLogger()
+                ->log($message);
+    }
+
+    /**
+     * Get queue
+     *
      * @return Robinhq_Hooks_Model_Queue
      */
-    public function getQueue() {
-
+    public function getQueue()
+    {
         return $this->queue;
     }
 
     /**
+     * Get API
+     *
      * @return Robinhq_Hooks_Model_Api
      */
-    public function getApi() {
-
+    public function getApi()
+    {
         return $this->api;
     }
 
-    public function getLogger() {
-
+    /**
+     * Get logger
+     *
+     * @return Robinhq_Hooks_Model_Logger
+     */
+    public function getLogger()
+    {
         return $this->logger;
     }
 
-    public static function warnAdmin($warning) {
-
-        Mage::getSingleton('adminhtml/session')->addWarning("Robin: " . $warning);
+    public static function warnAdmin($warning)
+    {
+        Mage::getSingleton('adminhtml/session')
+                ->addWarning("Robin: " . $warning);
     }
 
-    public static function noticeAdmin($notice) {
-
-        Mage::getSingleton('adminhtml/session')->addSuccess("Robin: " . $notice);
+    public static function noticeAdmin($notice)
+    {
+        Mage::getSingleton('adminhtml/session')
+                ->addSuccess("Robin: " . $notice);
     }
 
-    public static function formatPrice($price) {
-
-        return Mage::helper('core')->currency($price, true, false);
+    public static function formatPrice($price)
+    {
+        return Mage::helper('core')
+                ->currency($price, true, false);
     }
 
     /**
+     * Get converter
+     *
      * @return Robinhq_Hooks_Model_Robin_Converter
      */
-    public function getConverter() {
-
+    public function getConverter()
+    {
         return $this->converter;
     }
 
     /**
+     * Get collector
+     *
      * @return Robinhq_Hooks_Model_Collector
      */
-    public function getCollector() {
-
+    public function getCollector()
+    {
         return $this->collector;
     }
 
-    public function formatPhoneNumber($phoneNumber, $countryCode) {
-        $phoneNumberClean = preg_replace("/[^\d]/", "", $phoneNumber);
-        $length = strlen($phoneNumberClean);
-        if($length == 10) {
-            $phoneNumberFormatted = $phoneNumber;
+    /**
+     * Format phone number
+     *
+     * @param string $phoneNumber
+     * @param string $countryCode
+     * @return string
+     */
+    public function formatPhoneNumber($phoneNumber, $countryCode)
+    {
+        $phoneNumberClean = preg_replace("/[^\\d]+/s", '', $phoneNumber);
+        $length = +strlen($phoneNumberClean);
+        if (10 === $length) {
+            return $phoneNumber;
         }
-        elseif($length == 11) {
-            if($countryCode=='NL')  {
-                if(substr($phoneNumberClean, 0, 2)=='31') {
-                    $phoneNumberFormatted = substr_replace($phoneNumberClean,'0',0,2);
-                }
-            }else{
-                $phoneNumberFormatted = $phoneNumber;
-            }
+
+        if (11 === $length && 'NL' === $countryCode && strpos($phoneNumberClean, '31') === 0) {
+            return '0' . substr($phoneNumberClean, 2);
         }
-        if(!isset($phoneNumberFormatted))   {
-            $phoneNumberFormatted = $phoneNumberClean;
-        }
-        return $phoneNumberFormatted;
+
+        return $phoneNumberClean;
     }
 
     /**
      * Get reward points for a customer
      *
-     * @param Mage_Customer_Model_Customer $_customer
+     * @param Mage_Customer_Model_Customer $customer
      * @return int
      */
-    public function getRewardPoints($_customer) {
+    public function getRewardPoints($customer)
+    {
+        if (!$customer->getId()) {
+            return 0;
+        }
+
+        if (!Mage::getConfig()->getModuleConfig('Rewardpoints')->is('active', 'true')) {
+            return 0;
+        }
+
+        $rewardFlatModel = Mage::getModel('rewardpoints/flatstats');
+        $rewardModel = Mage::getModel('rewardpoints/stats');
+
         $points = 0;
-
-        if(Mage::getConfig()->getModuleConfig('Rewardpoints')->is('active', 'true'))  {
-            $allStores = Mage::app()->getStores();
-            if ($_customer->getId()) {
-                foreach ($allStores as $_eachStoreId => $val) {
-                    $_storeId = Mage::app()->getStore($_eachStoreId)->getId();
-                    if (Mage::getStoreConfig('rewardpoints/default/flatstats', $_storeId)) {
-                        $reward_flat_model = Mage::getModel('rewardpoints/flatstats');
-                        if($reward_flat_model)  {
-                            $points += $reward_flat_model->collectPointsCurrent($_customer->getId(), $_storeId) + 0;
-                        }
-                    } else {
-                        $reward_model = Mage::getModel('rewardpoints/stats');
-                        if($reward_model)   {
-                            $points += $reward_model->getPointsCurrent($_customer->getId(), $_storeId) + 0;
-                        }
-
-                    }
-                }
+        $storeIds = array_keys(Mage::app()->getStores());
+        foreach ($storeIds as $storeId) {
+            if ($rewardFlatModel && Mage::getStoreConfigFlag('rewardpoints/default/flatstats', $storeId)) {
+                $points += +$rewardFlatModel->collectPointsCurrent($customer->getId(), $storeId);
+            } elseif ($rewardModel) {
+                $points += +$rewardModel->getPointsCurrent($customer->getId(), $storeId);
             }
         }
+
         return $points;
     }
 
     /**
      * @param string $route
-     * @param array  $params
+     * @param array $params
      *
      * @return string
      */
-    public function getUrl($route='', $params=array())    {
+    public function getUrl($route = '', $params = array())
+    {
         return Mage::getModel('adminhtml/url')->setStore(Mage_Core_Model_App::ADMIN_STORE_ID)->getUrl($route, $params);
     }
 
