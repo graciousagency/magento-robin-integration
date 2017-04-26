@@ -6,12 +6,12 @@ class Robinhq_Hooks_Model_Queue_Orders extends Jowens_JobQueue_Model_Job_Abstrac
     /**
      * @var Robinhq_Hooks_Model_Robin_Order[]
      */
-    private $orders;
+    protected $orders;
 
     /**
      * @var false|Robinhq_Hooks_Model_Api
      */
-    private $api;
+    protected $api;
 
     /**
      * @param Robinhq_Hooks_Model_Api $api
@@ -19,8 +19,9 @@ class Robinhq_Hooks_Model_Queue_Orders extends Jowens_JobQueue_Model_Job_Abstrac
      */
     public function __construct(Robinhq_Hooks_Model_Api $api, $orders) {
         parent::__construct();
-        $this->api = $api;
+
         $this->orders = $orders;
+        $this->api = $api;
     }
 
     public function perform() {
