@@ -1,22 +1,17 @@
 <?php
 
-
 class Robinhq_Hooks_Model_Robin_Converter
 {
-    /**
-     * @var Robinhq_Hooks_Model_Robin_Customer
-     */
-    private $robinCustomer;
 
-    /**
-     * @var Robinhq_Hooks_Model_Robin_Order
-     */
-    private $robinOrder;
+    /** @var Robinhq_Hooks_Model_Robin_Customer */
+    protected $robinCustomer;
+    /** @var Robinhq_Hooks_Model_Robin_Order */
+    protected $robinOrder;
 
     public function __construct()
     {
-        $this->robinCustomer = Mage::getModel('hooks/robin_customer');
-        $this->robinOrder = Mage::getModel('hooks/robin_order');
+        $this->robinCustomer = Mage::getModel('robinhq_hooks/robin_customer');
+        $this->robinOrder = Mage::getModel('robinhq_hooks/robin_order');
     }
 
     /**
@@ -28,9 +23,9 @@ class Robinhq_Hooks_Model_Robin_Converter
      */
     public function toRobinCustomer($customer)
     {
-        return $this->robinCustomer->factory($customer);
+        return $this->robinCustomer
+                ->factory($customer);
     }
-
 
     /**
      * Converts a Mage_Sales_Model_Order into a array with required key/value pairs and a
@@ -41,6 +36,8 @@ class Robinhq_Hooks_Model_Robin_Converter
      */
     public function toRobinOrder($order)
     {
-        return $this->robinOrder->factory($order);
+        return $this->robinOrder
+                ->factory($order);
     }
+
 }
