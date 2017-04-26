@@ -6,7 +6,7 @@ class Robinhq_Hooks_Model_Queue_Orders extends Robinhq_Hooks_Model_Queue_Abstrac
     /**
      * @return string
      */
-    function getAction()
+    public function getAction()
     {
         return 'orders';
     }

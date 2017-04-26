@@ -1,7 +1,7 @@
 <?php
 
 
-class Robinhq_Hooks_Model_Queue_Abstract extends Jowens_JobQueue_Model_Job_Abstract
+abstract class Robinhq_Hooks_Model_Queue_Abstract extends Jowens_JobQueue_Model_Job_Abstract
 {
 
     /** @var array */
@@ -10,7 +10,7 @@ class Robinhq_Hooks_Model_Queue_Abstract extends Jowens_JobQueue_Model_Job_Abstr
     /**
      * @return string
      */
-    abstract function getAction();
+    abstract public function getAction();
 
     /**
      * Get API
