@@ -4,19 +4,39 @@
 class Robinhq_Hooks_Model_Exception_RequestFailed
 {
 
+    /**
+     * Get throwable exception
+     *
+     * @param string $statusCode
+     * @return Robinhq_Hooks_Model_Exception_Abstract
+     */
     public static function factory($statusCode)
     {
+        /** @var Robinhq_Hooks_Model_Robin_StatusCode $statusCode */
+        $statusCodes = Mage::getModel('robinhq_hooks/robin_statusCode');
+
         switch ($statusCode) {
-            case Robinhq_Hooks_Model_Robin_StatusCode::RATE_LIMIT_EXCEEDED:
-                return new Robinhq_Hooks_Model_Exception_RateLimitReachedException();
-            case Robinhq_Hooks_Model_Robin_StatusCode::BAD_REQUEST:
-                return new Robinhq_Hooks_Model_Exception_BadRequestException();
-            case Robinhq_Hooks_Model_Robin_StatusCode::UNAUTHORIZED:
-                return new Robinhq_Hooks_Model_Exception_UnauthorizedException();
-            case Robinhq_Hooks_Model_Robin_StatusCode::INTERNAL_SERVER_ERROR:
-                return new Robinhq_Hooks_Model_Exception_InternalServerErrorException();
+            case $statusCodes::RATE_LIMIT_EXCEEDED:
+                $errorModel = 'rateLimitReachedException';
+                break;
+
+            case $statusCodes::BAD_REQUEST:
+                $errorModel = 'badRequestException';
+                break;
+
+            case $statusCodes::UNAUTHORIZED:
+                $errorModel = 'unauthorizedException';
+                break;
+
+            case $statusCodes::INTERNAL_SERVER_ERROR:
+                $errorModel = 'internalServerErrorException';
+                break;
+
             default:
-                return new Robinhq_Hooks_Model_Exception_UnknownStatusCodeException($statusCode);
+                $errorModel = 'unknownStatusCodeException';
+
         }
+
+        return Mage::getModel('robinhq_hooks/exception_' . $errorModel);
     }
 }

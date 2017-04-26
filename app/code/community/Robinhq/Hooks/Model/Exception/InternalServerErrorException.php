@@ -1,7 +1,7 @@
 <?php
 
 
-class Robinhq_Hooks_Model_Exception_InternalServerErrorException extends Exception
+class Robinhq_Hooks_Model_Exception_InternalServerErrorException extends Robinhq_Hooks_Model_Exception_Abstract
 {
     protected $message = 'The request failed because of an internal server error on the ROBINHQ server';
 
