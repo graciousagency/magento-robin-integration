@@ -1,5 +1,26 @@
 {
-    "require": {
-        "giggsey/libphonenumber-for-php": "^7.2"
+  "name": "robinhq/hooks",
+  "type": "magento-module",
+  "author": [
+    {
+      "name": "Bram Wubs",
+      "email": "bwubs@me.com"
+    },
+    {
+      "name": "Pepijn Blom",
+      "email": "pepijn@graciousstudios.nl"
+    },
+    {
+      "name": "Wouter Steenmeijer",
+      "email": "wouter@elgentos.nl"
+    },
+    {
+      "name": "Jeroen Boersma",
+      "email": "jeroen@elgentos.nl"
     }
+  ],
+  "require": {
+    "jkowens/magento-jobqueue": "^0.5.0",
+    "magento-hackathon/magento-composer-installer": "*"
+  }
 }
