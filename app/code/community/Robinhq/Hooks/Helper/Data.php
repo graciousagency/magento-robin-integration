@@ -23,25 +23,29 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract
     /** @var Robinhq_Hooks_Model_Logger */
     protected $logger;
 
-    /** @var int */
-    protected $bulkLimit;
-    /** @var int */
-    protected $selectLimit;
-
     /**
      * Gets and sets the dependency's
      */
     public function __construct()
     {
-
-        $this->bulkLimit = $bulkLimit = abs(+$this->getConfig('bulk_limit'));
-        $this->selectLimit = $selectLimit = abs(+$this->getConfig('select_limit'));
+        $bulkLimit = abs(+$this->getConfig('bulk_limit'));
+        $selectLimit = abs(+$this->getConfig('select_limit'));
 
         $this->logger = $logger = Mage::getModel('robinhq_hooks/logger');
-        $this->api = $api = Mage::getModel('robinhq_hooks/api', [$logger]);
+        $this->api = $api = Mage::getModel('robinhq_hooks/api', [$this]);
         $this->queue = $queue = Mage::getModel('robinhq_hooks/queue', [$logger, $api, $bulkLimit]);
         $this->converter = $converter = Mage::getModel('robinhq_hooks/robin_converter');
         $this->collector = Mage::getModel('robinhq_hooks/collector', [$queue, $converter, $selectLimit]);
+    }
+
+    /**
+     * Tell if module is enabled in configuration
+     *
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        return $this->getConfigFlag('enabled');
     }
 
     /**
@@ -69,7 +73,7 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * Log message
      *
-     * @param sting $message
+     * @param string $message
      */
     public function log($message)
     {
@@ -107,18 +111,29 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->logger;
     }
 
+    /**
+     * Add admin message
+     */
     public static function warnAdmin($warning)
     {
         Mage::getSingleton('adminhtml/session')
                 ->addWarning("Robin: " . $warning);
     }
 
+    /**
+     * Add admin message
+     */
     public static function noticeAdmin($notice)
     {
         Mage::getSingleton('adminhtml/session')
                 ->addSuccess("Robin: " . $notice);
     }
 
+    /**
+     * Format price
+     *
+     * @param float $price
+     */
     public static function formatPrice($price)
     {
         return Mage::helper('core')
@@ -209,7 +224,6 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract
     {
         return Mage::getModel('adminhtml/url')->setStore(Mage_Core_Model_App::ADMIN_STORE_ID)->getUrl($route, $params);
     }
-
 
 }
 	 
