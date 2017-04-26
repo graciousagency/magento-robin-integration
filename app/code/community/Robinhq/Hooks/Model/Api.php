@@ -125,6 +125,8 @@ class Robinhq_Hooks_Model_Api
     }
 
     /**
+     * Execute request
+     *
      * @param $ch
      * @return mixed
      * @throws Robinhq_Hooks_Model_Exception_RequestImpossibleException
