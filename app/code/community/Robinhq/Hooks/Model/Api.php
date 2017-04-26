@@ -136,9 +136,9 @@ class Robinhq_Hooks_Model_Api
         if (false === curl_exec($ch)) {
             curl_close($ch);
 
-            $error = Mage::getModel('robinhq_hooks/exception_requestImpossibleException', [
+            $error = Mage::getModel('robinhq_hooks/exception_requestImpossibleException',
                     "Error: 'Unable to preform request to Robin, request was not executed.'"
-            ]);
+            );
 
             throw new $error;
         }

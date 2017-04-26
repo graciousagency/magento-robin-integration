@@ -67,7 +67,7 @@ class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Cont
         $helper->log('Putting the Mass Sender action on the queue');
 
         /** @var Robinhq_Hooks_Model_Queue_Mass $massQueue */
-        $massQueue = Mage::getModel('robinhq_hooks/queue_mass', [$helper]);
+        $massQueue = Mage::getModel('robinhq_hooks/queue_mass', $helper);
 
         $massQueue->setName('ROBIN Mass Send');
         $massQueue->enqueue();

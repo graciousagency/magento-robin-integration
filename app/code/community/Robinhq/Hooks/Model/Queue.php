@@ -126,24 +126,19 @@ class Robinhq_Hooks_Model_Queue
 
         switch ($this->type) {
             case self::ORDER:
-                $queueAble = Mage::getModel('robinhq_hooks/queue_orders', [
-                        $helper->getApi(),
-                        $this->models
-                ]);
+                $queueAble = Mage::getModel('robinhq_hooks/queue_orders');
                 break;
 
             case self::CUSTOMER:
-                $queueAble = Mage::getModel('robinhq_hooks/queue_customer', [
-                        $helper->getApi(),
-                        $this->models
-                ]);
+                $queueAble = Mage::getModel('robinhq_hooks/queue_customer');
                 break;
 
         }
 
         $helper->log($message . " added to the queue");
 
-        /** @var Jowens_JobQueue_Model_Job_Abstract $queueAble */
+        /** @var Robinhq_Hooks_Model_Queue_Abstract $queueAble */
+        $queueAble->setMessages($this->models);
         $queueAble->setName($message);
         $queueAble->enqueue();
     }

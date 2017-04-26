@@ -29,10 +29,10 @@ class Robinhq_Hooks_Helper_Data extends Mage_Core_Helper_Abstract
     public function __construct()
     {
         $this->logger = $logger = Mage::getModel('robinhq_hooks/logger');
-        $this->api = Mage::getModel('robinhq_hooks/api', [$this]);
-        $this->queue = Mage::getModel('robinhq_hooks/queue', [$this]);
+        $this->api = Mage::getModel('robinhq_hooks/api', $this);
+        $this->queue = Mage::getModel('robinhq_hooks/queue', $this);
         $this->converter = Mage::getModel('robinhq_hooks/robin_converter');
-        $this->collector = Mage::getModel('robinhq_hooks/collector', [$this]);
+        $this->collector = Mage::getModel('robinhq_hooks/collector', $this);
     }
 
     /**
