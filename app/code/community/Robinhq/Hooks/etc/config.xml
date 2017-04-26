@@ -2,28 +2,27 @@
 <config>
     <modules>
         <Robinhq_Hooks>
-            <version>2.1.7</version>
+            <version>2.2.0</version>
         </Robinhq_Hooks>
     </modules>
     <global>
         <helpers>
-            <hooks>
+            <robinhq_hooks>
                 <class>Robinhq_Hooks_Helper</class>
-            </hooks>
+            </robinhq_hooks>
         </helpers>
         <blocks>
-            <hooks>
+            <robinhq_hooks>
                 <class>Robinhq_Hooks_Block</class>
-            </hooks>
+            </robinhq_hooks>
         </blocks>
         <models>
-            <hooks>
+            <robinhq_hooks>
                 <class>Robinhq_Hooks_Model</class>
-                <resourceModel>hooks_mysql4</resourceModel>
-            </hooks>
+            </robinhq_hooks>
         </models>
         <resources>
-            <hooks_setup>
+            <robinnhq_hooks_setup>
                 <setup>
                     <module>Robinhq_Hooks</module>
                     <class>Mage_Customer_Model_Entity_Setup</class>
@@ -31,26 +30,16 @@
                 <connection>
                     <use>core_setup</use>
                 </connection>
-            </hooks_setup>
-            <hooks_write>
-                <connection>
-                    <use>core_write</use>
-                </connection>
-            </hooks_write>
-            <hooks_read>
-                <connection>
-                    <use>core_read</use>
-                </connection>
-            </hooks_read>
+            </robinnhq_hooks_setup>
         </resources>
+
         <events>
             <customer_save_after>
                 <observers>
                     <customer_save_after_handler>
                         <type>singleton</type>
-                        <class>hooks/observer</class>
+                        <class>robinhq_hooks/observer</class>
                         <method>customerHook</method>
-                        <args></args>
                     </customer_save_after_handler>
                 </observers>
             </customer_save_after>
@@ -60,7 +49,6 @@
                         <type>singleton</type>
                         <class>hooks/observer</class>
                         <method>orderPlacedHook</method>
-                        <args></args>
                     </sales_order_place_after_handler>
                 </observers>
             </sales_order_place_after>
@@ -70,75 +58,55 @@
                         <type>model</type>
                         <class>hooks/observer</class>
                         <method>orderStatusChangeHook</method>
-                        <args></args>
                     </sales_order_save_after_handler>
                 </observers>
             </sales_order_save_after>
         </events>
     </global>
+
     <admin>
         <routers>
-            <hooks>
-                <use>admin</use>
+            <adminhtml>
                 <args>
-                    <module>Robinhq_Hooks</module>
-                    <frontName>hooks</frontName>
+                    <modules>
+                        <robinhq_hooks after="Mage_Adminhtml">Robinhq_Hooks_Adminhtml</robinhq_hooks>
+                    </modules>
                 </args>
-            </hooks>
+            </adminhtml>
         </routers>
     </admin>
+
     <adminhtml>
-        <menu>
-            <robinhq module="hooks">
-                <title>Robin</title>
-                <sort_order>90</sort_order>
-                <children>
-                    <hooksbackend module="hooks">
-                        <title>Mass Send</title>
-                        <sort_order>0</sort_order>
-                        <action>hooks/adminhtml_hooksbackend</action>
-                    </hooksbackend>
-                </children>
-            </robinhq>
-        </menu>
-        <acl>
-            <resources>
-                <all>
-                    <title>Allow Everything</title>
-                </all>
-                <admin>
-                    <children>
-                        <hooks translate="title" module="hooks">
-                            <title>Hooks</title>
-                            <sort_order>1000</sort_order>
-                            <children>
-                                <hooksbackend translate="title">
-                                    <title>Robin</title>
-                                </hooksbackend>
-                            </children>
-                        </hooks>
-                    </children>
-                </admin>
-            </resources>
-        </acl>
         <layout>
             <updates>
                 <hooks>
-                    <file>hooks.xml</file>
+                    <file>robinhq_hooks.xml</file>
                 </hooks>
             </updates>
         </layout>
     </adminhtml>
+
+    <frontend>
+        <layout>
+            <updates>
+                <robinhq_hooks>
+                    <file>robinhq_hooks.xml</file>
+                </robinhq_hooks>
+            </updates>
+        </layout>
+    </frontend>
+
     <default>
         <settings>
             <general>
                 <enabled>0</enabled>
-                <api_key></api_key>
-                <api_secret></api_secret>
+                <api_key />
+                <api_secret />
                 <api_url>https://api.robinhq.com/</api_url>
                 <bulk_limit>15</bulk_limit>
                 <select_limit>500</select_limit>
             </general>
         </settings>
     </default>
+
 </config> 
