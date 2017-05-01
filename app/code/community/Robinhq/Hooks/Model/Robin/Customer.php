@@ -79,6 +79,10 @@ class Robinhq_Hooks_Model_Robin_Customer
     protected function getCustomerPhoneNumber(Mage_Customer_Model_Customer $customer, Robinhq_Hooks_Helper_Data $helper)
     {
         $billing = $customer->getDefaultBillingAddress();
+        if (!$billing) {
+            return '';
+        }
+
         return $helper->formatPhoneNumber($billing->getTelephone(), $billing->getCountryId());
     }
 

@@ -47,7 +47,7 @@
                 <observers>
                     <sales_order_place_after_handler>
                         <type>singleton</type>
-                        <class>hooks/observer</class>
+                        <class>robinhq_hooks/observer</class>
                         <method>orderPlacedHook</method>
                     </sales_order_place_after_handler>
                 </observers>
@@ -56,7 +56,7 @@
                 <observers>
                     <sales_order_save_after_handler>
                         <type>model</type>
-                        <class>hooks/observer</class>
+                        <class>robinhq_hooks/observer</class>
                         <method>orderStatusChangeHook</method>
                     </sales_order_save_after_handler>
                 </observers>

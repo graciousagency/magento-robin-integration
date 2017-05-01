@@ -133,6 +133,11 @@ class Robinhq_Hooks_Model_Queue
                 $queueAble = Mage::getModel('robinhq_hooks/queue_customer');
                 break;
 
+            default:
+                // Not implemented
+                Mage::log('Not implemented call ' . $this->type . $message, null, 'robin.log');
+                return;
+
         }
 
         $helper->log($message . " added to the queue");
