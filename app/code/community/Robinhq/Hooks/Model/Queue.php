@@ -143,9 +143,15 @@ class Robinhq_Hooks_Model_Queue
         $helper->log($message . " added to the queue");
 
         /** @var Robinhq_Hooks_Model_Queue_Abstract $queueAble */
-        $queueAble->setMessages($this->models);
-        $queueAble->setName($message);
-        $queueAble->enqueue();
+        if ($queueAble !== null) {
+            $queueAble->setMessages($this->models);
+            $queueAble->setName($message);
+            $queueAble->enqueue();
+        } else {
+            $helper->log($queueAble . " was null. This was the message: " . $message . " And this was the type: " . $this->type);
+        }
+
+
     }
 
     /**
