@@ -130,7 +130,7 @@ class Robinhq_Hooks_Model_Queue
                 break;
 
             case self::CUSTOMER:
-                $queueAble = Mage::getModel('robinhq_hooks/queue_customer');
+                $queueAble = Mage::getModel('robinhq_hooks/queue_customers');
                 break;
 
             default:
@@ -143,7 +143,7 @@ class Robinhq_Hooks_Model_Queue
         $helper->log($message . " added to the queue");
 
         /** @var Robinhq_Hooks_Model_Queue_Abstract $queueAble */
-        if ($queueAble !== null) {
+        if ($queueAble !== false) {
             $queueAble->setMessages($this->models);
             $queueAble->setName($message);
             $queueAble->enqueue();
