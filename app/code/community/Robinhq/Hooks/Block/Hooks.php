@@ -36,7 +36,7 @@ class Robinhq_Hooks_Block_Hooks extends Mage_Catalog_Block_Product_Abstract
                 $childStock = array();
                 foreach ($product->getTypeInstance(true)->getUsedProducts(null, $product) as $_simple) {
                     $stockQty = Mage::getModel('cataloginventory/stock_item')->loadByProduct($_simple)->getQty();
-                    $childStock[] = $_simple->getAttributeText('size') . ": " . ($stockQty > 0 ? 'In' : 'Not in') . " Stock (" . $stockQty . ") ";
+                    $childStock[] = $_simple->getSku() . ' - ' . ($stockQty > 0 ? 'In' : 'Not in') . " Stock (" . round($stockQty) . ")<br/>";
                 }
 
                 $stockText = implode($childStock);
