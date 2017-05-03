@@ -1,55 +1,50 @@
 <?php
 
-
-class Robinhq_Hooks_Model_Collector {
-
-    /**
-     * @var Robinhq_Hooks_Model_Queue
-     */
-    private $queue;
-    /**
-     * @var Robinhq_Hooks_Model_Robin_Converter
-     */
-    private $converter;
+class Robinhq_Hooks_Model_Collector
+{
+    /** @var Robinhq_Hooks_Helper_Data */
+    protected $helper;
 
     /**
      * The number of items per page in a collection
      * @var int
      */
-    private $pagination;
+    protected $pagination;
 
     /**
-     * @param Robinhq_Hooks_Model_Queue $queue
-     * @param Robinhq_Hooks_Model_Robin_Converter $converter
-     * @param $pagination
+     * @param Robinhq_Hooks_Helper_Data $helper
      */
-    public function __construct(Robinhq_Hooks_Model_Queue $queue, Robinhq_Hooks_Model_Robin_Converter $converter, $pagination) {
-
-        $this->queue = $queue;
-        $this->converter = $converter;
-        $this->pagination = $pagination;
+    public function __construct(
+            Robinhq_Hooks_Helper_Data $helper
+    ) {
+        $this->helper = $helper;
+        $this->pagination = +$helper->getConfig('select_limit');
     }
 
-    public function orders() {
+    public function orders()
+    {
+        $queue = $this->helper->getQueue();
+        $queue->setType($queue::ORDER);
 
-        $this->queue->setType(Robinhq_Hooks_Model_Queue::ORDER);
         $collection = $this->getOrdersPaginated($this->pagination);
         $this->walk($collection, 'orderCallback');
     }
 
-    public function customers() {
+    public function customers()
+    {
+        $queue = $this->helper->getQueue();
+        $queue->setType($queue::CUSTOMER);
 
-        $this->queue->setType(Robinhq_Hooks_Model_Queue::CUSTOMER);
         $collection = $this->getCustomersPaginated($this->pagination);
         $this->walk($collection, 'customerCallback');
     }
 
     /**
-     * @param $collection
+     * @param Varien_Data_Collection $collection
      * @param array $callback
      */
-    private function iterate($collection, array $callback) {
-
+    protected function iterate($collection, array $callback)
+    {
         $array = $collection->toArray();
         $array = (array_key_exists('items', $array)) ? $array['items'] : $array;
         array_map($callback, $array);
@@ -59,13 +54,17 @@ class Robinhq_Hooks_Model_Collector {
      *
      * @param $customerData
      */
-    private function customerCallback($customerData) {
-
+    public function customerCallback($customerData)
+    {
         /** @var Mage_Customer_Model_Customer $customer */
         $customer = Mage::getModel('customer/customer');
         $customer->setData($customerData);
-        $customer = $this->converter->toRobinCustomer($customer);
-        $this->queue->push($customer);
+
+        $helper = $this->helper;
+        $customer = $helper->getConverter()
+                ->toRobinCustomer($customer);
+        $helper->getQueue()
+                ->push($customer);
     }
 
     /**
@@ -73,66 +72,73 @@ class Robinhq_Hooks_Model_Collector {
      *
      * @param $orderData
      */
-    private function orderCallback($orderData) {
-
+    protected function orderCallback($orderData)
+    {
         /** @var Mage_Sales_Model_Order $order */
         $order = Mage::getModel('sales/order')
-                     ->load($orderData['entity_id'], 'entity_id')
-        ;
-        if (!empty($order->customer_email)) {
-            $order = $this->converter->toRobinOrder($order);
-            $this->queue->push($order);
+                ->load($orderData['entity_id'], 'entity_id');
+
+        $email = $order->getData('customer_email');
+        if (empty($email)) {
+            return;
         }
-        $order = null;
+
+        $helper = $this->helper;
+        $order = $helper->getConverter()
+                ->toRobinOrder($order);
+        $helper->getQueue()
+                ->push($order);
     }
 
     /**
      * @return Mage_Sales_Model_Order[]|Varien_Data_Collection
      */
-    private function getOrdersPaginated($size) {
-
+    protected function getOrdersPaginated($size)
+    {
         return Mage::getModel('sales/order')
-                           ->getCollection()
-                           ->addAttributeToSelect('entity_id')
-                           ->addAttributeToSelect('customer_email')
-                           ->setOrder('increment_id', 'DESC')
-                           ->addFieldToFilter('customer_email', ['notnull' => true])
-                           ->setPageSize($size)
-        ;
+                ->getCollection()
+                ->addAttributeToSelect('entity_id')
+                ->addAttributeToSelect('customer_email')
+                ->setOrder('increment_id', 'DESC')
+                ->addFieldToFilter('customer_email', ['notnull' => true])
+                ->setPageSize($size);
     }
 
     /**
      * @return Mage_Customer_Model_Customer[]|Varien_Data_Collection
      */
-    private function getCustomersPaginated($size) {
-
+    protected function getCustomersPaginated($size)
+    {
         return Mage::getModel('customer/customer')
-                           ->getCollection()
-                           ->addNameToSelect()
-                           ->addAttributeToSelect('email')
-                           ->joinAttribute('billing_telephone', 'customer_address/telephone', 'default_billing', null, 'left')
-                           ->addAttributeToSelect('created_at')
-                           ->addFieldToFilter('email', ['notnull' => true])
-                           ->setPageSize($size)
-        ;
+                ->getCollection()
+                ->addNameToSelect()
+                ->addAttributeToSelect('email')
+                ->joinAttribute('billing_telephone', 'customer_address/telephone', 'default_billing', null, 'left')
+                ->addAttributeToSelect('created_at')
+                ->addFieldToFilter('email', ['notnull' => true])
+                ->setPageSize($size);
     }
 
     /**
-     * @param $collection
-     * @param $callback
+     * @param Varien_Data_Collection $collection
+     * @param string $callback
      */
-    private function walk(Varien_Data_Collection $collection, $callback) {
-
+    protected function walk(Varien_Data_Collection $collection, $callback)
+    {
         $size = $collection->getLastPageNumber();
         for ($i = 1; $i <= $size; $i++) {
             $collection->setCurPage($i);
             $collection->load();
             $this->iterate($collection, [
-                $this,
-                $callback,
+                    $this,
+                    $callback,
             ]);
             $collection->clear();
         }
-        $this->queue->clear();
+
+        $this->helper
+                ->getQueue()
+                ->clear();
     }
+
 }

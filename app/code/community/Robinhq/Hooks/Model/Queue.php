@@ -1,47 +1,43 @@
 <?php
 
-
-class Robinhq_Hooks_Model_Queue {
+class Robinhq_Hooks_Model_Queue
+{
 
     const ORDER = 1;
 
     const CUSTOMER = 2;
-    /**
-     * @var false|Robinhq_Hooks_Model_Logger
-     */
-    private $logger;
 
-    private $models = [];
+    /** @var Robinhq_Hooks_Helper_Data */
+    protected $helper;
+    /** @var array  */
+    protected $models = [];
+    /** @var int */
+    protected $limit;
+    /** @var int */
+    protected $batch = 0;
 
-    private $limit;
-
-    private $batch = 0;
-
-    /**
-     * @var false|Robinhq_Hooks_Model_Api
-     */
-    private $api;
-
-    private $type;
+    /** @var int */
+    protected $type;
 
     /**
-     * @param Robinhq_Hooks_Model_Logger $logger
-     * @param Robinhq_Hooks_Model_Api $api
-     * @param $limit
+     * @param Robinhq_Hooks_Helper_Data $helper
      */
-    public function __construct(Robinhq_Hooks_Model_Logger $logger, Robinhq_Hooks_Model_Api $api, $limit) {
-
-        $this->limit = $limit;
-        $this->api = $api;
-        $this->logger = $logger;
+    public function __construct(Robinhq_Hooks_Helper_Data $helper)
+    {
+        $this->helper = $helper;
+        $this->limit = +$helper->getConfig('bulk_limit');
     }
 
     /**
-     * @param $type
+     * Set type
+     *
+     * @param int $type
+     * @return $this
      */
-    public function setType($type) {
-
+    public function setType($type)
+    {
         $this->type = $type;
+        return $this;
     }
 
     /**
@@ -50,7 +46,8 @@ class Robinhq_Hooks_Model_Queue {
      *
      * @param $model
      */
-    public function push($model) {
+    public function push($model)
+    {
         $this->models[] = $model;
         $this->enqueueWhenBatchLimitIsReached();
     }
@@ -61,7 +58,8 @@ class Robinhq_Hooks_Model_Queue {
      *
      * @param $model
      */
-    public function pushImmediately($model)   {
+    public function pushImmediately($model)
+    {
         $this->models[] = $model;
         $this->enqueueDeduplicate();
         $this->reset();
@@ -72,11 +70,9 @@ class Robinhq_Hooks_Model_Queue {
      * afterwards it resets the $this->models to an empty array.
      * It also sets the batch number back to zero
      */
-    public function clear() {
-
-        if (!empty($this->models)) {
-            $this->enqueue();
-        }
+    public function clear()
+    {
+        $this->enqueue();
         $this->batch = 0;
         $this->reset();
     }
@@ -84,80 +80,139 @@ class Robinhq_Hooks_Model_Queue {
     /**
      * This creates a queue as used by the mass uploader
      */
-    private function enqueue() {
+    protected function enqueue()
+    {
+        $helper = $this->helper;
 
-        $queueAble = null;
-        $message = 'Nothing';
+        if (empty($this->models)) {
+            // Nothing to do
+            return;
+        }
+
         $first = $this->models[0];
         $last = end($this->models);
         reset($this->models);
-        if ($this->type === static::ORDER) {
-            $queueAble = new Robinhq_Hooks_Model_Queue_Orders($this->api, $this->models);
-            $message = "Orders batch #" . $this->batch++ . " containing " . count($this->models) . " orders (" . $first['order_number'] . " - " . $last['order_number'] . ")";
+
+        switch ($this->type) {
+            case self::ORDER:
+                $message = "Orders batch #" . $this->batch++ . " containing "
+                        . count($this->models) . " orders (" . $first['order_number'] . " - "
+                        . $last['order_number'] . ")";
+                break;
+
+            case self::CUSTOMER:
+                $message = "Customers batch #" . $this->batch++ . " containing "
+                        . count($this->models) . " customers (" . $first['email_address'] . " - "
+                        . $last['email_address'] . ")";
+                break;
+
+            default:
+                $helper->log("Nothing added to the queue");
+                return;
+
         }
-        if ($this->type === static::CUSTOMER) {
-            $queueAble = new Robinhq_Hooks_Model_Queue_Customers($this->api, $this->models);
-            $message = "Customers batch #" . $this->batch++ . " containing " . count($this->models) . " customers (" . $first['email_address'] . " - " . $last['email_address'] . ")";
+
+        $this->processQueueWithMessage($message);
+    }
+
+    /**
+     * Process queue with message
+     *
+     * @param $message
+     */
+    protected function processQueueWithMessage($message)
+    {
+        $helper = $this->helper;
+
+        switch ($this->type) {
+            case self::ORDER:
+                $queueAble = Mage::getModel('robinhq_hooks/queue_orders');
+                break;
+
+            case self::CUSTOMER:
+                $queueAble = Mage::getModel('robinhq_hooks/queue_customers');
+                break;
+
+            default:
+                // Not implemented
+                Mage::log('Not implemented call ' . $this->type . $message, null, 'robin.log');
+                return;
+
         }
-        if ($queueAble !== null) {
+
+        $helper->log($message . " added to the queue");
+
+        /** @var Robinhq_Hooks_Model_Queue_Abstract $queueAble */
+        if ($queueAble !== false) {
+            $queueAble->setMessages($this->models);
             $queueAble->setName($message);
             $queueAble->enqueue();
+        } else {
+            $helper->log($queueAble . " was null. This was the message: " . $message . " And this was the type: " . $this->type);
         }
-        $this->logger->log($message . " added to the queue");
+
+
     }
 
     /**
      * This enqueues the model and removes any old ones with the same message name
      * This is generally used by the observer since Magento has a knack of firing off multiple events during a single submit
      */
-    private function enqueueDeduplicate() {
+    protected function enqueueDeduplicate()
+    {
+        $helper = $this->helper;
 
-        $queueAble = null;
-        $message = 'Nothing';
+        if (empty($this->models)) {
+            // Nothing to do
+            return;
+        }
+
+        // Get first model
         $model = $this->models[0];
-        if ($this->type === static::ORDER) {
-            $message = "Order " . $model['order_number'];
-            $jobs = Mage::getModel('jobqueue/job')
-                ->getCollection()
-                ->addFieldToFilter('name', $message)
-            ;
-            $jobs->walk('delete');
-            $queueAble = new Robinhq_Hooks_Model_Queue_Orders($this->api, $this->models);
+
+        /** @var Jowens_JobQueue_Model_Resource_Job_Collection $jobs */
+        $jobs = Mage::getResourceModel('jobqueue/job_collection');
+
+        switch ($this->type) {
+            case self::ORDER:
+                $message = "Order " . $model['order_number'];
+                break;
+
+            case self::CUSTOMER:
+                $message = "Customer " . $model['order_number'];
+                break;
+
+            default:
+                $helper->log("Nothing added to the queue");
+                return;
+
         }
-        if ($this->type === static::CUSTOMER) {
-            $message = "Customer " . $model['email_address'];
-            $jobs = Mage::getModel('jobqueue/job')
-                ->getCollection()
-                ->addFieldToFilter('name', $message)
-            ;
-            $jobs->walk('delete');
-            $queueAble = new Robinhq_Hooks_Model_Queue_Customers($this->api, $this->models);
-        }
-        if ($queueAble !== null) {
-            $queueAble->setName($message);
-            $queueAble->enqueue();
-        }
-        $this->logger->log($message . " added to the queue");
+
+        $jobs->addFieldToFilter('name', $message);
+        $jobs->walk('delete');
+
+        $this->processQueueWithMessage($message);
     }
 
     /**
      * Enqueue when the batch limit has been reached
      *
-     * @return bool
+     * @return void
      */
-    private function enqueueWhenBatchLimitIsReached() {
-
+    protected function enqueueWhenBatchLimitIsReached()
+    {
         if (count($this->models) === $this->limit) {
             $this->enqueue();
             $this->reset();
         }
-        return;
     }
 
     /**
      * Empty $this->models
      */
-    private function reset() {
+    protected function reset()
+    {
         $this->models = [];
     }
+
 }

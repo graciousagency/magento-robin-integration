@@ -1,7 +1,7 @@
 <?php
 
 
-class Robinhq_Hooks_Model_Exception_BadRequestException extends Exception
+class Robinhq_Hooks_Model_Exception_BadRequestException extends Robinhq_Hooks_Model_Exception_Abstract
 {
     protected $message = "The request failed because the data provided was not recognised by the ROBINHQ API";
 

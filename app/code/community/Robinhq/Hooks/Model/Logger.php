@@ -4,18 +4,16 @@
 /**
  * Class Robinhq_Hooks_Model_Logger
  */
-class Robinhq_Hooks_Model_Logger {
+class Robinhq_Hooks_Model_Logger
+{
 
     /**
      * Logs the given string to var/log/Robinhq_Hooks.log
      * @param $string
      */
-    public static function log($string) {
-
+    public static function log($string)
+    {
         Mage::log($string, null, 'Robinhq_Hooks.log');
-//        if (defined('STDIN')) {
-//            echo 'Magento [Robinhq Mass Sender]: ' . $string . "\n";
-//        }
     }
 
     /**
@@ -25,8 +23,8 @@ class Robinhq_Hooks_Model_Logger {
      * other information you need to check during development.
      * @param $value
      */
-    public static function debug($value) {
-
+    public static function debug($value)
+    {
         Mage::log($value, null, "Robinhq_Hooks-debug.log");
     }
 }

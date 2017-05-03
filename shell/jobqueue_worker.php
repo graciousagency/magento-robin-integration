@@ -1,19 +1,15 @@
 <?php
+
 error_reporting(E_ALL | E_STRICT);
-ini_set('display_errors', '1');
+ini_set('display_errors', 1);
 
-class jobqueueWorker{
+require __DIR__ . '../app/Mage.php';
+umask(0);
 
-    public function __construct()   {
-        require '../app/Mage.php';
-        umask(0);
-        Mage::app('admin')->setUseSessionInUrl(false);
-        Mage::getConfig()->init();
-        $worker = new Jowens_JobQueue_Model_Worker();
-        $worker->executeJobs();
-    }
+Mage::app('admin')
+        ->setUseSessionInUrl(false);
+Mage::getConfig()
+        ->init();
 
-}
-
-$jobqueueWorker = new jobqueueWorker();
-
+$worker = new Jowens_JobQueue_Model_Worker();
+$worker->executeJobs();

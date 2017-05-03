@@ -4,43 +4,40 @@
 /**
  * Class Robinhq_Hooks_Adminhtml_HooksbackendController
  */
-class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Controller_Action {
+class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Controller_Action
+{
+
+    /** @var Robinhq_Hooks_Helper_Data */
+    protected $helper;
 
     /**
-     * @var Robinhq_Hooks_Helper_Data
+     * Construct controller, set helper
      */
-    private $helper;
-
-    /**
-     * Sets up $this->helper
-     */
-    private function isEnabled() {
-
-        $this->helper = Mage::helper('hooks');
-        $config = Mage::getStoreConfig('settings/general');
-        return $config['enabled'];
+    protected function _construct()
+    {
+        parent::_construct();
+        $this->helper = Mage::helper('robinhq_hooks');
     }
 
     /**
      * Before the index is rendered
      */
-    private function beforeRenderIndex() {
-
+    protected function beforeRenderIndex()
+    {
         $this->_title($this->__('Robin'));
         $block = $this->getLayout()
-            ->createBlock('adminhtml/widget_button', 'massImportButton')
-            ->setData([
-                'label'   => Mage::helper('adminhtml')->__('Enqueue the Mass Sender'),
-                'onclick' => "setLocation('{$this->getUrl('*/adminhtml_hooksbackend/run')}')",
-            ])
-        ;
+                ->createBlock('adminhtml/widget_button', 'massImportButton')
+                ->setData([
+                        'label' => Mage::helper('adminhtml')->__('Enqueue the Mass Sender'),
+                        'onclick' => "setLocation('{$this->getUrl('*/adminhtml_hooksbackend/run')}')",
+                ]);
         $this->_addContent($block);
         $this->_setActiveMenu('robinhq/hooks');
     }
 
 
-    public function indexAction() {
-
+    public function indexAction()
+    {
         $this->loadLayout();
         $this->beforeRenderIndex();
         $this->renderLayout();
@@ -52,21 +49,33 @@ class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Cont
      * and converting them to objects the ROBIN API can understand on the queue. This process
      * will start as soon as your queue starts processing jobs. The moment your queue initiates
      * depends on your cron settings. Please, be sure to enable cron.
+     *
+     * @return void
      */
-    public function runAction() {
+    public function runAction()
+    {
+        $helper = $this->helper;
 
-        if ($this->isEnabled()) {
-            $this->helper->log('Putting the Mass Sender action on the queue');
-            $massQueue = new Robinhq_Hooks_Model_Queue_Mass($this->helper);
-            $massQueue->setName('ROBIN Mass Send');
-            $massQueue->enqueue();
-            $this->helper->log('Done. Wait until the queue kicks in and handles these jobs');
-            $this->helper->noticeAdmin('The Mass Send process is pushed to the queue.');
-        } else {
+        if (!$this->helper->isEnabled()) {
             $message = 'Module is disabled. Please enable it first.';
-            $this->helper->warnAdmin($message);
-            $this->helper->log($message);
+            $helper->warnAdmin($message);
+            $helper->log($message);
+            $this->_redirect('*/adminhtml_hooksbackend/index');
+            return;
         }
+
+        $helper->log('Putting the Mass Sender action on the queue');
+
+        /** @var Robinhq_Hooks_Model_Queue_Mass $massQueue */
+        $massQueue = Mage::getModel('robinhq_hooks/queue_mass', $helper);
+
+        $massQueue->setName('ROBIN Mass Send');
+        $massQueue->enqueue();
+
+        $helper->log('Done. Wait until the queue kicks in and handles these jobs');
+        $helper->noticeAdmin('The Mass Send process is pushed to the queue.');
+
         $this->_redirect('*/adminhtml_hooksbackend/index');
     }
+
 }

@@ -1,6 +1,9 @@
-# magento-robin-integration
-app/code/community/Robinhq/Hooks                        app/code/community/Robinhq/Hooks
-app/design/adminhtml/default/default/layout/hooks.xml   app/design/adminhtml/default/default/layout/hooks.xml
-app/design/adminhtml/default/default/template/hooks     app/design/adminhtml/default/default/template/hooks
-app/etc/modules/Robinhq_Hooks.xml                       app/etc/modules/Robinhq_Hooks.xml
-shell/jobqueue_worker.php                               shell/jobqueue_worker.php
+app/code/community/Robinhq/Hooks                                app/code/community/Robinhq/Hooks
+
+app/design/adminhtml/default/default/layout/robinhq_hooks.xml   app/design/adminhtml/default/default/layout/robinhq_hooks.xml
+app/design/adminhtml/default/default/template/robinhq_hooks     app/design/adminhtml/default/default/template/robinhq_hooks
+app/design/frontend/base/default/layout/robinhq_hooks.xml       app/design/frontend/base/default/layout/robinhq_hooks.xml
+app/design/frontend/base/default/template/robinhq_hooks         app/design/frontend/base/default/template/robinhq_hooks
+
+app/etc/modules/Robinhq_Hooks.xml                               app/etc/modules/Robinhq_Hooks.xml
+shell/jobqueue_worker.php                                       shell/jobqueue_worker.php

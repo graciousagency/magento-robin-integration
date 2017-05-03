@@ -1,20 +1,13 @@
 <?php
 
-
 /**
  * Created by PhpStorm.
  * User: bwubs
  * Date: 16/06/14
  * Time: 17:10
  */
-class Robinhq_Hooks_Model_Robin_Customer {
-
-    /**
-     * @var Mage_Customer_Model_Customer
-     */
-    private $customer;
-
-    private $data;
+class Robinhq_Hooks_Model_Robin_Customer
+{
 
     /**
      * Factory method for creating an array with key/value pairs
@@ -23,56 +16,55 @@ class Robinhq_Hooks_Model_Robin_Customer {
      * @param Mage_Customer_Model_Customer $customer
      * @return array
      */
-    public function factory(Mage_Customer_Model_Customer $customer) {
+    public function factory(Mage_Customer_Model_Customer $customer)
+    {
+        /** @var Robinhq_Hooks_Helper_Data $helper */
+        $helper = Mage::helper('robinhq_hooks');
 
-        $this->customer = $customer;
-        return $this->make();
-    }
+        $lifetime = $this->getLifeTimeSalesCustomer($customer);
 
-    /**
-     * Makes the array the Robin API expects. If you want more
-     * info in the panel view, just add it in the $robinCustomer['panel_view'] array
-     *
-     * @return array
-     */
-    private function make() {
+        $formattedTotalSpent = Mage::helper('core')
+                ->currency($lifetime->getLifetime(), true, false);
 
-        $lifetime = $this->getLifeTimeSalesCustomer();
-        $formattedTotalSpent = Mage::helper('core')->currency($lifetime->getLifetime(), true, false);
-        $phoneNumber = $this->getCustomerPhoneNumber();
+        $phoneNumber = $this->getCustomerPhoneNumber($customer, $helper);
         $orderCount = $lifetime->getNumOrders();
-        $rewardPoints = Mage::helper('hooks')->getRewardPoints($this->customer);
 
-        $this->data = [
-           'email_address'  => trim($this->customer->getEmail()),
-           'customer_since' => Mage::getModel('core/date')->date('Y-m-d', strtotime($this->customer->getCreatedAt())),
-           'order_count'    => $orderCount,
-           'total_spent'    => $formattedTotalSpent,
-           'panel_view'     => [
-               'Reward_points' => $rewardPoints,
-           ],
-           'name'           => $this->customer->getName(),
-           'currency'       => Mage::app()->getStore()->getCurrentCurrencyCode(),
-           'phone_number'   => $phoneNumber,
-           'reward_points'  => $rewardPoints,
+        $rewardPoints = $helper->getRewardPoints($customer);
+
+        return [
+                'email_address' => trim($customer->getEmail()),
+                'customer_since' => Mage::getModel('core/date')
+                        ->date('Y-m-d', strtotime($customer->getCreatedAt())),
+                'order_count' => $orderCount,
+                'total_spent' => $formattedTotalSpent,
+                'panel_view' => [
+                        'Reward_points' => $rewardPoints,
+                ],
+                'name' => $customer->getName(),
+                'currency' => Mage::app()
+                        ->getStore()
+                        ->getCurrentCurrencyCode(),
+                'phone_number' => $phoneNumber,
+                'reward_points' => $rewardPoints,
         ];
-        return $this->data;
     }
 
     /**
      * Gets customer statics like total order count and total spend.
      *
-     * @return array
+     * @param Mage_Customer_Model_Customer $customer
+     * @return Varien_Object
      */
-    public function getLifeTimeSalesCustomer() {
+    public function getLifeTimeSalesCustomer(Mage_Customer_Model_Customer $customer)
+    {
+        /** @var Mage_Sales_Model_Resource_Sale_Collection $collection */
+        $collection = Mage::getResourceModel('sales/sale_collection');
 
-        $totals = Mage::getResourceModel('sales/sale_collection')
-            ->setCustomerFilter($this->customer)
-            ->setOrderStateFilter(Mage_Sales_Model_Order::STATE_CANCELED, true)
-            ->load()
-            ->getTotals()
-        ;
-        return $totals;
+        $collection->setCustomerFilter($customer)
+                ->setOrderStateFilter(Mage_Sales_Model_Order::STATE_CANCELED, true)
+                ->load();
+
+        return $collection->getTotals();
     }
 
     /**
@@ -80,17 +72,18 @@ class Robinhq_Hooks_Model_Robin_Customer {
      * it loads the default billing address and retrieves the telephone
      * number from there. When both are null, it'll return an emtpy string.
      *
+     * @param Mage_Customer_Model_Customer $customer
+     * @param Robinhq_Hooks_Helper_Data $helper
      * @return string
-     *
      */
-    private function getCustomerPhoneNumber() {
-        $phone = '';
-        $address = Mage::getModel('customer/address');
-        $billing = $address->load($this->customer->getDefaultBilling());
-        $countryId = $billing->getCountryId();
-        $phone = $billing->getTelephone();
-        $phone = Mage::helper('hooks')->formatPhoneNumber($phone, $countryId);
-        return $phone;
+    protected function getCustomerPhoneNumber(Mage_Customer_Model_Customer $customer, Robinhq_Hooks_Helper_Data $helper)
+    {
+        $billing = $customer->getDefaultBillingAddress();
+        if (!$billing) {
+            return '';
+        }
+
+        return $helper->formatPhoneNumber($billing->getTelephone(), $billing->getCountryId());
     }
 
 }
