@@ -4,10 +4,8 @@
         <Robinhq_Hooks>
             <active>true</active>
             <codePool>community</codePool>
+            <version>0.0.1</version>
             <depends>
-                <Mage_Customer />
-                <Mage_Catalog />
-                <Mage_Sales />
                 <Jowens_JobQueue />
             </depends>
         </Robinhq_Hooks>
