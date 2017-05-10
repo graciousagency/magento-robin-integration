@@ -29,7 +29,7 @@ class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Cont
                 ->createBlock('adminhtml/widget_button', 'massImportButton')
                 ->setData([
                         'label' => Mage::helper('adminhtml')->__('Enqueue the Mass Sender'),
-                        'onclick' => "setLocation('{$this->getUrl('*/adminhtml_hooksbackend/run')}')",
+                        'onclick' => "setLocation('{$this->getUrl('*/hooksbackend/run')}')",
                 ]);
         $this->_addContent($block);
         $this->_setActiveMenu('robinhq/hooks');
@@ -60,7 +60,7 @@ class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Cont
             $message = 'Module is disabled. Please enable it first.';
             $helper->warnAdmin($message);
             $helper->log($message);
-            $this->_redirect('*/adminhtml_hooksbackend/index');
+            $this->_redirect('*/hooksbackend/index');
             return;
         }
 
@@ -75,7 +75,7 @@ class Robinhq_Hooks_Adminhtml_HooksbackendController extends Mage_Adminhtml_Cont
         $helper->log('Done. Wait until the queue kicks in and handles these jobs');
         $helper->noticeAdmin('The Mass Send process is pushed to the queue.');
 
-        $this->_redirect('*/adminhtml_hooksbackend/index');
+        $this->_redirect('*/hooksbackend/index');
     }
 
 }
