@@ -113,15 +113,15 @@ class Robinhq_Hooks_Model_Robin_Order
      */
     protected function getProductsOverview(Mage_Sales_Model_Order $order)
     {
-        return [
-                "display_as" => 'columns',
-                "caption" => 'products',
-                "data" => [
-                        $this->getProducts($order),
-                        $this->getShipmentInfo($order),
-                        $this->getOrderTotalInfo($order)
-                ],
+        $base = [
+            'display_as' => 'columns',
+            'caption'    => 'products',
+            'data'       => [],
         ];
+        $base['data']   = $this->getProducts($order);
+        $base['data'][] = $this->getShipmentInfo($order);
+        $base['data'][] = $this->getOrderTotalInfo($order);
+        return $base;
     }
 
     /**
