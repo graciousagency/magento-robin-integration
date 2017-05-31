@@ -292,9 +292,6 @@ Inside the `data` key you can add an array with objects containing key/value pai
 
  Note: the name of the key will also be displayed, so be sure to format it nicely.
 
-
-
-
 ### Environment
 
 This example code is all developed with the use of a Vagrant box. If you want to develop you own implementation based on this code, I strongly recommend to use a Vagrant box as a development environment as the setup is quick and easy. If you are new to Vagrant, please watch [this][magento-vagrant] little presentation to get you up to speed.
@@ -314,11 +311,19 @@ The idea here is to create a separated folder that only contains the module file
 
 Now you can develop inside the `.modman/magento-robin-integration` folder.
 
+## Links
+
+Modman to install the module easily
+[modman](https://github.com/colinmollenhour/modman)
+
+Magerun lets you enable symlinks, generate phpstorm helper file, run module setup, etc. A must have!
+[magerun](http://magerun.net/)
+
+[request-api-key-secret](http://docs.robinhq.com/faq/api-secret-request/)
+
+[robin-api](http://docs.robinhq.com/faq/robin-api/)
+
+
 ## License
 The code is licensed under the [GPL v3 licence][gpl-v3-licence] 
-
-[modman]: https://github.com/colinmollenhour/modman
-[magerun]: http://magerun.net/
-[request-api-key-secret]: http://docs.robinhq.com/faq/api-secret-request/
-[robin-api]: http://docs.robinhq.com/faq/robin-api/
-[gpl-v3-licence]: http://choosealicense.com/licenses/gpl-3.0/
+[gpl-v3-licence](http://choosealicense.com/licenses/gpl-3.0/)
