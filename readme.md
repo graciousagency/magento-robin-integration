@@ -56,7 +56,7 @@ This module listens to the following events:
 - `sales_order_place_after`
 - `sales_order_save_after`
 
-####customer_save_after
+#### customer_save_after
 
 This event gets called when a customer is created, it's information changed or when the customer places an order. On this event `Robinhq_Hooks_Model_Observer::customerHook` gets executed as defined in `etc/config.xml`
 
@@ -79,7 +79,7 @@ This event gets called when a customer is created, it's information changed or w
 </config>
 ```
 
-####sales_order_place_after
+#### sales_order_place_after
 
 This event gets called after an order is placed. On this event `Robinhq_Hooks_Model_Observer::orderPlacedHook` gets executed as defined in `etc/config.xml`
 
@@ -102,7 +102,7 @@ This event gets called after an order is placed. On this event `Robinhq_Hooks_Mo
 </config>
 ```
 
-####sales_order_save_after
+#### sales_order_save_after
 
 This event gets called after an orders status changes or when any other type of order related  changes gets saved. On this event `Robinhq_Hooks_Model_Observer::orderStatusChanceHook` gets executed as defined in `etc/config.xml`
 
@@ -124,11 +124,11 @@ This event gets called after an orders status changes or when any other type of 
     </global>
 </config>
 ```
-###The Code
+### The Code
 
 The class `Robinhq_Hooks_Model_Observer` is the entry class for all events that we are hooking into. From there the api gets called by using `Robinhq_Hooks_Model_Api::orders()` or Robinhq_Hooks_Model_Api::customers()`.
 
-####Robinhq_Hooks_Model_Api::orders()
+#### Robinhq_Hooks_Model_Api::orders()
 
 This method goes through all orders given to it, maps it to a RobinOrder as required by the [Robin API][robin-api] and sends it to the `orders` API endpoint.
 To generate a RobinOrder the method `Robinhq_Hooks_Model_RobinOrder::factory()` is used. This method collects order details like the products, shipments and invoices and formats them according to the `details_view` object required by the [Robin API][robin-api].
@@ -229,7 +229,7 @@ To generate a RobinOrder the method `Robinhq_Hooks_Model_RobinOrder::factory()` 
 }
 ```
 
-####Robinhq_Hooks_Model_Api::customers()
+#### Robinhq_Hooks_Model_Api::customers()
 
 This method goes through all customers given to it and maps them to a RobinCustomer as required by the [Robin API][robin-api] and sends them to the `customers` API endpoint. To generate a RobinCustomer the method `Robinhq_Hooks_Model_RobinCustomer::factory()` is used. This method makes a customer object required by the [Robin API][robin-api].
 
@@ -254,7 +254,7 @@ The ROBIN API documentation also talks about optional data. This package sends t
  
 The `panel_view` contains a new object of key/value pairs that can be anything. As an example I've added the total orders and the total spent. How to use the panel_view array is explained in the [Robin API][robin-api] documentation.
 
-####Adding more order data to send to Robin
+#### Adding more order data to send to Robin
 
 You can extend the data you want to be visible inside Robin by adding key/value pairs to the `list_view` or the `data` arrays each method inside `Robinhq_Hooks_Model_RobinOrder::getDetailsView()` returns. 
 If you want to add a complete new `details_view` like the comments from a order, you can add the logic inside the `Robinhq_Hooks_Model_RobinOrder::getDetailsView()` method like this
@@ -301,29 +301,24 @@ This example code is all developed with the use of a Vagrant box. If you want to
 
 I recommend to use [this one][magento-vagrant-github]. Simply follow the instructions provided there and you should have a virtual Magento installation in no-time. 
 
-####Git and Magento module development
+#### Git and Magento module development
 
-The development of a Magento module that is a git repo can be hard. To get it working I've figured out the following.
-Make a folder called `module` inside your Vagrant root and do a git clone inside that folder (`git clone [url] .`). Make sure it's inside the Vagrant root, because this will ensure the files are automatically accessible inside the Vagrant machine.
-
-Next simply do the following commands in the folder where you ran `vagrant up` (if you haven't done that yet, please do it now and wait till it completes)
-```bash
-vagrant ssh
-ln -s /vagrant/module/app/etc/modules/Robinhq_Hooks.xml /vagrant/www/magento/app/etc/modules/Robinhq_Hooks.xml
-ln -s /vagrant/module/app/code/community/Robinhq/ /vagrant/www/magento/app/code/community/Robinhq
-ln -s /vagrant/module/design/adminhtml/default/default/layout/hooks.xml /vagrant/www/magento/app/design/adminhtml/default/default/layout/hooks.xml
-ln -s /vagrant/module/design/adminhtml/default/default/template/hooks/ /vagrant/www/magento/app/design/adminhtml/default/default/template/hooks
+The easiest way to install is to use modman:
+```
+cd your_magento_project_dir
+modman init
+modman clone https://github.com/graciousstudios/magento-robin-integration.git
 ```
 And enable symlinks by going to System -> Configuration -> ADVANCED -> Developer -> Template Settings and set `Allow Symlinks` to `Yes`.
 The idea here is to create a separated folder that only contains the module files and folders and link that to the magento installation. This way your magento installation won't have to be a git repository and you won't have to do some weird .gitignore magic.
 
-Now you can develop inside the `module` folder. All new files created inside `/vagrant/module/app/code/community/Robinhq/` and `/vagrant/module/design/adminhtml/default/default/template/hooks/` will also be inside the Magento installation.
+Now you can develop inside the `.modman/magento-robin-integration` folder.
 
-##License
+## License
 The code is licensed under the [GPL v3 licence][gpl-v3-licence] 
 
-[magento-vagrant]: http://broderboy.github.io/vagrant-magento-presentation/#/
-[magento-vagrant-github]: https://github.com/matthewsplant/magento-vagrant-puppet
+[modman]: https://github.com/colinmollenhour/modman
+[magerun]: http://magerun.net/
 [request-api-key-secret]: http://docs.robinhq.com/faq/api-secret-request/
 [robin-api]: http://docs.robinhq.com/faq/robin-api/
 [gpl-v3-licence]: http://choosealicense.com/licenses/gpl-3.0/
