@@ -49,7 +49,7 @@ class Robinhq_Hooks_Model_Robin_Customer
                 'phone_number' => $phoneNumber,
                 'reward_points' => $rewardPoints,
                 'latest_order_date' => Mage::getModel('core/date')
-                        ->date('Y-m-d', strtotime($latestOrder->getCreatedAt()))
+                        ->date('Y-m-d\TH:i:s\Z', strtotime($latestOrder->getCreatedAt()))
         ];
     }
 
