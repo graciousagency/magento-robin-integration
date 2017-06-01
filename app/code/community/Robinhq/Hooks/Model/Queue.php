@@ -179,7 +179,7 @@ class Robinhq_Hooks_Model_Queue
                 break;
 
             case self::CUSTOMER:
-                $message = "Customer " . $model['order_number'];
+                $message = "Customer " . $model['email_address'];
                 break;
 
             default:
