@@ -300,7 +300,10 @@ I recommend to use [this one][magento-vagrant-github]. Simply follow the instruc
 
 #### Git and Magento module development
 
-The easiest way to install is to use modman:
+~~The easiest way to install is to use modman:~~
+
+The latest version of Magento 1.9.3.3 disables the use of symlinks and thus stops this installation method from working or should at least not be used anymore.
+
 ```
 cd your_magento_project_dir
 modman init
@@ -313,7 +316,7 @@ Now you can develop inside the `.modman/magento-robin-integration` folder.
 
 ## Links
 
-Modman to install the module easily
+~~Modman to install the module easily~~
 [modman](https://github.com/colinmollenhour/modman)
 
 Magerun lets you enable symlinks, generate phpstorm helper file, run module setup, etc. A must have!
