@@ -37,6 +37,6 @@ class Robinhq_Hooks_Model_Exception_RequestFailed
 
         }
 
-        return Mage::getModel('robinhq_hooks/exception_' . $errorModel);
+        return Mage::getModel('robinhq_hooks/exception_' . $errorModel, '');
     }
 }
