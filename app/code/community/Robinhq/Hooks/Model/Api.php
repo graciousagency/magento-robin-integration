@@ -112,7 +112,7 @@ class Robinhq_Hooks_Model_Api
         if (in_array($responseInfo['http_code'], $errorCodes)) {
 
             /** @var Robinhq_Hooks_Model_Exception_RequestFailed $requestFailedFactory */
-            $requestFailedFactory = Mage::getModel('robinhq_exception_RequestFailed');
+            $requestFailedFactory = Mage::getModel('robinhq_hooks/exception_requestFailed');
 
             $error = $requestFailedFactory::factory($responseInfo['http_code']);
 
