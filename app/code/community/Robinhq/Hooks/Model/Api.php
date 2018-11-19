@@ -85,6 +85,18 @@ class Robinhq_Hooks_Model_Api
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_USERPWD, $apiKey . ":" . $apiSecret);
 
+        if (!empty($config['api_connect_timeout'])
+            && is_numeric($config['api_connect_timeout'])
+        ) {
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, (int) $config['api_connect_timeout']);
+        }
+
+        if (!empty($config['api_connect'])
+            && is_numeric($config['api_connect'])
+        ) {
+            curl_setopt($ch, CURLOPT_TIMEOUT, (int) $config['api_connect']);
+        }
+
         return $ch;
     }
 

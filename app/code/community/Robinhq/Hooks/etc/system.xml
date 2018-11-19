@@ -62,10 +62,28 @@
                             <show_in_store>1</show_in_store>
                             <comment>Robin API url</comment>
                         </api_url>
+                        <api_connect_timeout translate="label">
+                            <label>API Connect Timeout in seconds</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>400</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>API Connect Timeout in seconds</comment>
+                        </api_connect_timeout>
+                        <api_timeout translate="label">
+                            <label>API Timeout in seconds</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>500</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>API Timeout in seconds</comment>
+                        </api_timeout>
                         <bulk_limit translate="label">
                             <label>Bulk Limit</label>
                             <frontend_type>text</frontend_type>
-                            <sort_order>300</sort_order>
+                            <sort_order>600</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
@@ -76,7 +94,7 @@
                         <select_limit translate="label">
                             <label>Select Limit</label>
                             <frontend_type>text</frontend_type>
-                            <sort_order>300</sort_order>
+                            <sort_order>700</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
