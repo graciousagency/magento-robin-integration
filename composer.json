@@ -20,7 +20,7 @@
     }
   ],
   "require": {
-    "jkowens/magento-jobqueue": "^0.5.0",
+    "jkowens/magento-jobqueue": "^0.8.0",
     "magento-hackathon/magento-composer-installer": "*"
   }
 }
